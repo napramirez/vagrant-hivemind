@@ -1,7 +1,2 @@
-require "vagrant/hivemind/version"
-
-module Vagrant
-  module Hivemind
-    # Your code goes here...
-  end
-end
+require_relative "hivemind/version"
+require_relative "hivemind/plugin"
