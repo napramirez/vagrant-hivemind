@@ -2,6 +2,7 @@ require "optparse"
 
 require "vagrant/hivemind/constants"
 require "vagrant/hivemind/util"
+require "vagrant/hivemind/host"
 
 module Vagrant
   module Hivemind
@@ -36,15 +37,24 @@ module Vagrant
 
           if Vagrant::Hivemind::Util::HiveFile.exist? work_dir
             if options[:force]
-              puts "TODO: Overwrite the Hive file with a new one"
+              puts "TODO: Warn that the Hive file has been overwritten"
+              write_new_hive_file work_dir
             else
               puts "TODO: Warn that the Hive file already exists!"
             end
           else
-            puts "TODO: Create new Hive file"
+            puts "TODO: Inform that the Hive file has been created in the working directory"
+            write_new_hive_file work_dir
           end
 
           0
+        end
+
+        def write_new_hive_file(work_dir)
+          hosts = {
+            "control" => Vagrant::Hivemind::Host.control
+          }
+          Vagrant::Hivemind::Util::HiveFile.write_to hosts, work_dir
         end
       end
     end
