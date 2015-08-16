@@ -18,12 +18,12 @@ module Vagrant
           }
 
           OptionParser.new do |o|
-            o.banner = "Usage: vagrant hivemind init [options]"
+            o.banner = "Usage: vagrant hivemind list [options]"
             o.separator ""
             o.separator "Options:"
             o.separator ""
 
-            o.on("-d", "--directory DIRECTORY", "Specify the directory where '#{Vagrant::Hivemind::Constants::HIVE_FILE}' will be created (default: current directory)") do |d|
+            o.on("-d", "--directory DIRECTORY", "Specify the directory where '#{Vagrant::Hivemind::Constants::HIVE_FILE}' is located (default: current directory)") do |d|
               options[:directory] << d
             end
           end.parse!
