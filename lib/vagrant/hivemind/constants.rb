@@ -17,6 +17,12 @@ module Vagrant
         :large       => 2048,
         :extra_large => 4096
       }
+
+      CONTROL = "control"
+
+      PRIVATE_NETWORK = "192.168.50.*"
+      PRIVATE_NETWORK_START = 100
+
     end
   end
 end

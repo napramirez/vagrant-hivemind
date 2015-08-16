@@ -35,6 +35,14 @@ module Vagrant
           end
       end
 
+      class Network
+
+        def self.starting_ip_address
+          Vagrant::Hivemind::Constants::PRIVATE_NETWORK.sub('*', (Vagrant::Hivemind::Constants::PRIVATE_NETWORK_START).to_s)
+        end
+
+      end
+
     end
   end
 end
