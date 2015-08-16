@@ -41,6 +41,12 @@ module Vagrant
           Vagrant::Hivemind::Constants::PRIVATE_NETWORK.sub('*', (Vagrant::Hivemind::Constants::PRIVATE_NETWORK_START).to_s)
         end
 
+        def self.next_ip_address(hosts = {})
+          host_count = hosts.size
+          ip_address = Vagrant::Hivemind::Constants::PRIVATE_NETWORK.sub('*', (Vagrant::Hivemind::Constants::PRIVATE_NETWORK_START+host_count).to_s)
+          host_count += 1
+          ip_address
+        end
       end
 
     end
