@@ -7,6 +7,10 @@ module Vagrant
     module Util
 
       class HiveFile
+        def self.exist?(path = ".")
+          File.exist? get_hive_file_from_path path
+        end
+
         def self.read_from(path = ".")
           hive_file = get_hive_file_from_path path
           hosts_from_hive_file = {}
