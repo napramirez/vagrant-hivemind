@@ -38,7 +38,7 @@ module Vagrant
             puts "| Hostname             | IP Address     | C | Size         | Box Type   | G |"
             puts "+----------------------+----------------+---+--------------+------------+---+"
             hosts.values.each do |host|
-              puts "| #{'%-20.20s' % host.hostname} | #{'%-14.14s' % host.ip_address} | #{host.is_control ? 'Y' : 'N'} | :#{'%-11.11s' % host.memory_in_mb} | :#{'%-9.9s' % host.box} | #{host.is_gui ? 'Y' : 'N'} |"
+              puts "| #{'%-20.20s' % host.hostname} | #{'%-14.14s' % host.ip_address} | #{host.is_control ? 'Y' : 'N'} | :#{'%-11.11s' % host.memory_in_mb} | :#{'%-9.9s' % host.box} | #{Vagrant::Hivemind::Constants::BOX_TYPES[host.box][:is_gui] ? 'Y' : 'N'} |"
             end
             puts "+----------------------+----------------+---+--------------+------------+---+"
 
