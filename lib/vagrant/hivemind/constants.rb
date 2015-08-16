@@ -4,10 +4,10 @@ module Vagrant
       HIVE_FILE = "hive.yml"
 
       BOX_TYPES = {
-        :server    => "napramirez/ubuntu-14.04.2-LTS-amd64-server",
-        :kde       => "napramirez/kubuntu-14.04.2-LTS-amd64-lite",
-        :unity     => "napramirez/ubuntu-14.04.2-LTS-amd64-desktoplite",
-        :unityi386 => "napramirez/ubuntu-14.04.2-LTS-i386-desktoplite"
+        :server    => { name: "napramirez/ubuntu-14.04.2-LTS-amd64-server", is_gui: false },
+        :kde       => { name: "napramirez/kubuntu-14.04.2-LTS-amd64-lite", is_gui: true },
+        :unity     => { name: "napramirez/ubuntu-14.04.2-LTS-amd64-desktoplite", is_gui: true },
+        :unityi386 => { name: "napramirez/ubuntu-14.04.2-LTS-i386-desktoplite", is_gui: true }
       }
 
       BOX_SIZES = {
