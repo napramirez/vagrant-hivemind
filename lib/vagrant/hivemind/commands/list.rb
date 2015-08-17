@@ -37,7 +37,13 @@ module Vagrant
             @env.ui.info "| Hostname             | IP Address     | C | Size         | Box Type   | G |"
             @env.ui.info "+----------------------+----------------+---+--------------+------------+---+"
             hosts.values.each do |host|
-              @env.ui.info "| #{'%-20.20s' % host.hostname} | #{'%-14.14s' % host.ip_address} | #{host.is_control ? 'Y' : 'N'} | :#{'%-11.11s' % host.memory_in_mb} | :#{'%-9.9s' % host.box} | #{Vagrant::Hivemind::Constants::BOX_TYPES[host.box][:is_gui] ? 'Y' : 'N'} |"
+              hostname       = host.hostname
+              ip_address     = host.ip_address
+              is_control_y_n = host.is_control ? 'Y' : 'N'
+              box_size       = Vagrant::Hivemind::Constants::BOX_SIZES[host.box_size.to_sym][:name]
+              box_type       = Vagrant::Hivemind::Constants::BOX_TYPES[host.box_type.to_sym][:name]
+              is_gui_y_n     = Vagrant::Hivemind::Constants::BOX_TYPES[host.box_type.to_sym][:is_gui] ? 'Y' : 'N'
+              @env.ui.info "| #{'%-20.20s' % hostname} | #{'%-14.14s' % ip_address} | #{is_control_y_n} | #{'%-12.12s' % box_size} | #{'%-10.10s' % box_type} | #{is_gui_y_n} |"
             end
             @env.ui.info "+----------------------+----------------+---+--------------+------------+---+"
 
