@@ -7,7 +7,7 @@ module Vagrant
         end
 
         def execute
-          puts "Morph!"
+          @env.ui.info "Morph!"
           0
         end
       end

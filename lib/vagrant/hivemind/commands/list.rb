@@ -33,17 +33,16 @@ module Vagrant
           if Vagrant::Hivemind::Util::HiveFile.exist? work_dir
             hosts = Vagrant::Hivemind::Util::HiveFile.read_from work_dir
 
-            # TODO: Replace puts with a logger
-            puts "+----------------------+----------------+---+--------------+------------+---+"
-            puts "| Hostname             | IP Address     | C | Size         | Box Type   | G |"
-            puts "+----------------------+----------------+---+--------------+------------+---+"
+            @env.ui.info "+----------------------+----------------+---+--------------+------------+---+"
+            @env.ui.info "| Hostname             | IP Address     | C | Size         | Box Type   | G |"
+            @env.ui.info "+----------------------+----------------+---+--------------+------------+---+"
             hosts.values.each do |host|
-              puts "| #{'%-20.20s' % host.hostname} | #{'%-14.14s' % host.ip_address} | #{host.is_control ? 'Y' : 'N'} | :#{'%-11.11s' % host.memory_in_mb} | :#{'%-9.9s' % host.box} | #{Vagrant::Hivemind::Constants::BOX_TYPES[host.box][:is_gui] ? 'Y' : 'N'} |"
+              @env.ui.info "| #{'%-20.20s' % host.hostname} | #{'%-14.14s' % host.ip_address} | #{host.is_control ? 'Y' : 'N'} | :#{'%-11.11s' % host.memory_in_mb} | :#{'%-9.9s' % host.box} | #{Vagrant::Hivemind::Constants::BOX_TYPES[host.box][:is_gui] ? 'Y' : 'N'} |"
             end
-            puts "+----------------------+----------------+---+--------------+------------+---+"
+            @env.ui.info "+----------------------+----------------+---+--------------+------------+---+"
 
           else
-            puts "TODO: Inform that there is no Hive file in the working directory."
+            @env.ui.info "There is no Hive file in the working directory."
           end
 
           0

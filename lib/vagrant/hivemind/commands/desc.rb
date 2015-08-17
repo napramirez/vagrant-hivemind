@@ -7,7 +7,7 @@ module Vagrant
         end
 
         def execute
-          puts "Desc!"
+          @env.ui.info "Desc!"
           0
         end
       end

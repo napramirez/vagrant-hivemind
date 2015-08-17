@@ -7,7 +7,7 @@ module Vagrant
         end
 
         def execute
-          puts "Kill!"
+          @env.ui.info "Kill!"
           0
         end
       end

@@ -57,14 +57,14 @@ module Vagrant
               hosts = Vagrant::Hivemind::Util::HiveFile.read_from work_dir
 
               if hosts.values.map(&:hostname).include? options[:hostname]
-                puts "TODO: Inform that the specified hostname already exists."
+                @env.ui.info "The specified hostname already exists!"
               else
-                puts "TODO: Validate the format of the hostname"
-                puts "TODO: Spawn the Drone and add to the Hive."
+                @env.ui.info "TODO: Validate the format of the hostname"
+                @env.ui.info "TODO: Spawn the Drone and add to the Hive."
               end
 
             else
-              puts "TODO: Inform that there is no Hive file in the working directory."
+              @env.ui.info "There is no Hive file in the working directory."
             end
           else
             parser.parse %w[--help]
