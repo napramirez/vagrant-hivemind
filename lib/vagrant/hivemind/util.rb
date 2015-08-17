@@ -36,6 +36,10 @@ module Vagrant
       end
 
       class Network
+        def self.is_valid_hostname?(hostname)
+          return false unless hostname and hostname.size > 0 and hostname.size <= Vagrant::Hivemind::Constants::SIMPLE_HOSTNAME_MAX_LENGTH
+          return (Vagrant::Hivemind::Constants::SIMPLE_HOSTNAME_REGEX =~ hostname) != nil
+        end
 
         def self.starting_ip_address
           Vagrant::Hivemind::Constants::PRIVATE_NETWORK.sub('*', (Vagrant::Hivemind::Constants::PRIVATE_NETWORK_START).to_s)

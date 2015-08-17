@@ -23,6 +23,8 @@ module Vagrant
       PRIVATE_NETWORK = "192.168.50.*"
       PRIVATE_NETWORK_START = 100
 
+      SIMPLE_HOSTNAME_REGEX = /^[A-Za-z0-9]+([\-]{0,1}[A-Za-z0-9]+)*$/
+      SIMPLE_HOSTNAME_MAX_LENGTH = 20
     end
   end
 end

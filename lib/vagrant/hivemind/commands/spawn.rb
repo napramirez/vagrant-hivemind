@@ -59,8 +59,11 @@ module Vagrant
               if hosts.values.map(&:hostname).include? options[:hostname]
                 @env.ui.info "The specified hostname already exists!"
               else
-                @env.ui.info "TODO: Validate the format of the hostname"
-                @env.ui.info "TODO: Spawn the Drone and add to the Hive."
+                if Vagrant::Hivemind::Util::Network.is_valid_hostname? options[:hostname]
+                  @env.ui.info "TODO: Spawn the Drone and add to the Hive."
+                else
+                  @env.ui.info "Invalid hostname format!"
+                end
               end
 
             else
