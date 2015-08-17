@@ -15,9 +15,9 @@ module Vagrant
         def execute
           options = {
             :hostname  => nil,
-            :control   => false,
-            :size      => :small,
-            :type      => :server,
+            :control   => nil,
+            :size      => nil,
+            :type      => nil,
             :directory => []
           }
 
@@ -60,7 +60,18 @@ module Vagrant
                 @env.ui.info "The specified hostname already exists!"
               else
                 if Vagrant::Hivemind::Util::Network.is_valid_hostname? options[:hostname]
-                  @env.ui.info "TODO: Spawn the Drone and add to the Hive."
+                  drone = {
+                    options[:hostname] => Vagrant::Hivemind::Host.new(
+                      options[:hostname],
+                      Vagrant::Hivemind::Util::Network.next_ip_address(hosts),
+                      {
+                        is_control: options[:control],
+                        box_size:   options[:size],
+                        box_type:   options[:type]
+                      })
+                  }
+                  Vagrant::Hivemind::Util::HiveFile.write_to hosts.merge(drone), work_dir
+                  @env.ui.info "Spawned the Drone with hostname '#{options[:hostname]}'"
                 else
                   @env.ui.info "Invalid hostname format!"
                 end
