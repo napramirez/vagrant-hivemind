@@ -35,11 +35,11 @@ module Vagrant
               options[:control] = c
             end
 
-            o.on("-s", "--size SIZE", "The Box Size of the Drone [:extra_small, :small, :medium, :large, :extra_large] (default: :small)") do |s|
+            o.on("-s", "--size SIZE", Vagrant::Hivemind::Constants::BOX_SIZES.keys.map(&:to_s), "The Box Size of the Drone [:extra_small, :small, :medium, :large, :extra_large] (default: :small)") do |s|
               options[:size] = s
             end
 
-            o.on("-t", "--type TYPE", "The Box Type of the Drone [:server, :kde, :unity, :unityi386] (default: :server)") do |t|
+            o.on("-t", "--type TYPE", Vagrant::Hivemind::Constants::BOX_TYPES.keys.map(&:to_s), "The Box Type of the Drone [:server, :kde, :unity, :unityi386] (default: :server)") do |t|
               options[:type] = t
             end
 
