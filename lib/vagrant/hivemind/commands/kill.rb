@@ -1,3 +1,9 @@
+require "optparse"
+
+require "vagrant/hivemind/constants"
+require "vagrant/hivemind/util"
+require "vagrant/hivemind/host"
+
 module Vagrant
   module Hivemind
     module Command
@@ -7,7 +13,49 @@ module Vagrant
         end
 
         def execute
-          @env.ui.info "Kill!"
+          options = {
+            :hostname  => nil,
+            :directory => []
+          }
+
+          parser = OptionParser.new do |o|
+            o.banner = "Usage: vagrant hivemind kill [options]"
+            o.separator ""
+            o.separator "Options:"
+            o.separator ""
+
+            o.on("-n", "--hostname HOSTNAME", "The hostname of the Drone (REQUIRED)") do |n|
+              options[:hostname] = n
+            end
+
+            o.on("-d", "--directory DIRECTORY", "Specify the directory where '#{Vagrant::Hivemind::Constants::HIVE_FILE}' is located (default: current directory)") do |d|
+              options[:directory] << d
+            end
+          end
+
+          parser.parse!
+
+          work_dir = options[:directory].empty? ? "." : options[:directory].first
+
+          if options[:hostname]
+            if Vagrant::Hivemind::Util::HiveFile.exist? work_dir
+              hosts = Vagrant::Hivemind::Util::HiveFile.read_from work_dir
+
+              if hosts.values.map(&:hostname).include? options[:hostname]
+                hosts.delete options[:hostname]
+                Vagrant::Hivemind::Util::HiveFile.write_to hosts, work_dir
+                @env.ui.info "Killed the Drone with hostname '#{options[:hostname]}'"
+              else
+                @env.ui.info "The specified hostname does not exist!"
+              end
+
+            else
+              @env.ui.info "There is no Hive file in the working directory."
+            end
+          else
+            parser.parse %w[--help]
+          end
+
           0
         end
       end
