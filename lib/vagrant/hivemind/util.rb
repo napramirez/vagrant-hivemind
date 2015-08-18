@@ -42,14 +42,27 @@ module Vagrant
         end
 
         def self.starting_ip_address
-          Vagrant::Hivemind::Constants::PRIVATE_NETWORK.sub('*', (Vagrant::Hivemind::Constants::PRIVATE_NETWORK_START).to_s)
+          Vagrant::Hivemind::Constants::PRIVATE_NETWORK_IP_ADDRESS_POOL[0]
+        end
+
+        def self.highest_ip_address(hosts = {})
+          hosts.values.map(&:ip_address).sort.last
         end
 
         def self.next_ip_address(hosts = {})
-          host_count = hosts.size
-          ip_address = Vagrant::Hivemind::Constants::PRIVATE_NETWORK.sub('*', (Vagrant::Hivemind::Constants::PRIVATE_NETWORK_START+host_count).to_s)
-          host_count += 1
-          ip_address
+          highest_ip_address_index = Vagrant::Hivemind::Constants::PRIVATE_NETWORK_IP_ADDRESS_POOL.find_index highest_ip_address(hosts)
+
+          next_ip_address_index = highest_ip_address_index
+          loop do
+            next_ip_address_index = ((next_ip_address_index + 1) % Vagrant::Hivemind::Constants::PRIVATE_NETWORK_IP_ADDRESS_POOL.size)
+            next_ip_address_candidate = Vagrant::Hivemind::Constants::PRIVATE_NETWORK_IP_ADDRESS_POOL[next_ip_address_index]
+
+            return next_ip_address_candidate unless hosts.values.map(&:ip_address).include? next_ip_address_candidate
+
+            if next_ip_address_index == highest_ip_address_index
+              raise StandardError, "There are no more available ip addresses for the private network!"
+            end
+          end
         end
       end
 
