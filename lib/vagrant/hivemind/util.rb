@@ -41,6 +41,11 @@ module Vagrant
           return (Vagrant::Hivemind::Constants::SIMPLE_HOSTNAME_REGEX =~ hostname) != nil
         end
 
+        def self.is_valid_ip_address?(ip_address)
+          return false unless ip_address and ip_address.split(".").size == 4
+          return (Vagrant::Hivemind::Constants::IP_ADDRESS_REGEX =~ ip_address) != nil
+        end
+
         def self.starting_ip_address
           Vagrant::Hivemind::Constants::PRIVATE_NETWORK_IP_ADDRESS_POOL[0]
         end
