@@ -63,7 +63,12 @@ module Vagrant
 
               if hosts.values.map(&:hostname).include? options[:hostname]
                 # 0. Validate inputs
-                if options[:ip_address] and Vagrant::Hivemind::Util::Network.is_valid_ip_address? options[:ip_address]
+                if options[:ip_address]
+                  validation_error = is_valid_ip_address?(options[:ip_address], hosts)
+                  if validation_error
+                    @env.ui.info validation_error
+                    return 1
+                  end
                 end
 
                 # TODO: Morph!
@@ -96,6 +101,20 @@ module Vagrant
 
           0
         end
+
+        def is_valid_ip_address?(ip_address, hosts)
+          if !Vagrant::Hivemind::Util::Network.is_valid_ip_address? ip_address
+            return "Invalid IP address format!"
+          end
+          if Vagrant::Hivemind::Util::Network.get_network(ip_address) != Vagrant::Hivemind::Util::Network.get_network(Vagrant::Hivemind::Constants::PRIVATE_NETWORK)
+            return "The specified IP address does not belong to the same private network!"
+          end
+          if hosts.values.map(&:ip_address).include? ip_address
+            return "The specified IP address is already used!"
+          end
+          return nil
+        end
+
       end
     end
   end
