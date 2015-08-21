@@ -46,6 +46,25 @@ module Vagrant
           return (Vagrant::Hivemind::Constants::IP_ADDRESS_REGEX =~ ip_address) != nil
         end
 
+        def self.is_valid_port_pair?(port_pair)
+          return false unless port_pair and port_pair.split(":").size == 2
+          return (Vagrant::Hivemind::Constants::PORT_PAIR_REGEX =~ port_pair) != nil
+        end
+
+        def self.is_valid_port_value?(port)
+          port >= 0 and port <= 65535
+        end
+
+        def self.get_host_keys_using_host_port(host_port, hosts)
+          hosts.keys.select do |key|
+            host = hosts[key]
+            host.forwarded_ports and (
+              host.forwarded_ports.select do |forwarded_port|
+                forwarded_port["host_port"] == host_port
+              end).size > 0
+          end
+        end
+
         def self.get_network(ip_address)
           split_ip_address = ip_address.split(".")
           return nil unless split_ip_address.size == 4

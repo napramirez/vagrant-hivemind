@@ -71,6 +71,14 @@ module Vagrant
                   end
                 end
 
+                if options[:forwarded_port]
+                  validation_error = is_valid_forwarded_port?(options[:forwarded_port], hosts)
+                  if validation_error
+                    @env.ui.info validation_error
+                    return 1
+                  end
+                end
+
                 # TODO: Morph!
                 # 1. Get Drone
                 # 2. Modify Drone
@@ -78,15 +86,18 @@ module Vagrant
                 # 4. Re-attach morphed Drone
 
                 # 1.
-                drone = hosts[options[:hostname]]
+                host = hosts[options[:hostname]]
 
                 # 2.
-                
 
                 # 3.
                 hosts.delete options[:hostname]
+
                 # 4.
-                Vagrant::Hivemind::Util::HiveFile.write_to hosts, work_dir
+                drone = {
+                  options[:hostname] => host
+                }
+                Vagrant::Hivemind::Util::HiveFile.write_to hosts.merge(drone), work_dir
                 @env.ui.info "Morphed the Drone with hostname '#{options[:hostname]}'"
               else
                 @env.ui.info "The specified hostname does not exist!"
@@ -113,6 +124,24 @@ module Vagrant
             return "The specified IP address is already used!"
           end
           return nil
+        end
+
+        def is_valid_forwarded_port?(port_pair, hosts)
+          if !Vagrant::Hivemind::Util::Network.is_valid_port_pair? port_pair
+            return "Invalid port pair format!"
+          end
+
+          guest_port, host_port = port_pair.split(":").map.each { |n| n.to_i }
+          if !Vagrant::Hivemind::Util::Network.is_valid_port_value? guest_port
+            return "Guest port is out of range!"
+          end
+          if !Vagrant::Hivemind::Util::Network.is_valid_port_value? host_port
+            return "Host port is out of range!"
+          end
+
+          if Vagrant::Hivemind::Util::Network.get_host_keys_using_host_port(host_port, hosts).size > 0
+            return "Host port is already used!"
+          end
         end
 
       end
