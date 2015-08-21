@@ -23,6 +23,22 @@ module Vagrant
             o.separator "Options:"
             o.separator ""
 
+            o.on("-n", "--hostname", "List the Drones ordered by the hostname") do |n|
+              options[:hostname] = n
+            end
+
+            o.on("-a", "--ip-address", "List the Drones ordered by the IP address") do |a|
+              options[:ip_address] = a
+            end
+
+            o.on("-c", "--control", "List the Drones, Control Machines first") do |c|
+              options[:control] = c
+            end
+
+            o.on("-s", "--size", "List the Drones ordered by the Box Size") do |s|
+              options[:size] = s
+            end
+
             o.on("-d", "--directory DIRECTORY", "Specify the directory where '#{Vagrant::Hivemind::Constants::HIVE_FILE}' is located (default: current directory)") do |d|
               options[:directory] << d
             end
@@ -33,10 +49,12 @@ module Vagrant
           if Vagrant::Hivemind::Util::HiveFile.exist? work_dir
             hosts = Vagrant::Hivemind::Util::HiveFile.read_from work_dir
 
+            sorted_hosts = sort_hosts hosts, options
+
             @env.ui.info "+----------------------+----------------+---+--------------+------------+---+"
             @env.ui.info "| Hostname             | IP Address     | C | Size         | Box Type   | G |"
             @env.ui.info "+----------------------+----------------+---+--------------+------------+---+"
-            hosts.values.each do |host|
+            sorted_hosts.values.each do |host|
               hostname       = host.hostname
               ip_address     = host.ip_address
               is_control_y_n = host.is_control ? 'Y' : 'N'
@@ -53,6 +71,34 @@ module Vagrant
 
           0
         end
+
+        def sort_hosts(hosts, options = {})
+          sorted_hosts = hosts
+          options.keys.each do |key|
+            sorted_hosts = sort_hosts_by_hostname(hosts)   if key == :hostname
+            sorted_hosts = sort_hosts_by_ip_address(hosts) if key == :ip_address
+            sorted_hosts = sort_hosts_by_control(hosts)    if key == :control
+            sorted_hosts = sort_hosts_by_box_size(hosts)   if key == :size
+          end
+          sorted_hosts
+        end
+
+        def sort_hosts_by_hostname(hosts)
+          (hosts.sort_by { |k,v| v.hostname }).to_h
+        end
+
+        def sort_hosts_by_ip_address(hosts)
+          (hosts.sort_by { |k,v| v.ip_address }).to_h
+        end
+
+        def sort_hosts_by_control(hosts)
+          (hosts.sort_by { |k,v| v.is_control.to_s }.reverse).to_h
+        end
+
+        def sort_hosts_by_box_size(hosts)
+          (hosts.sort_by { |k,v| Vagrant::Hivemind::Constants::BOX_SIZES[v.box_size.to_sym][:memory_in_mb] }).to_h
+        end
+
       end
     end
   end
