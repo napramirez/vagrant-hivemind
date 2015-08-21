@@ -89,6 +89,33 @@ module Vagrant
                 host = hosts[options[:hostname]]
 
                 # 2.
+                if options[:ip_address]
+                  host.ip_address = options[:ip_address]
+                end
+
+                if options[:control]
+                  host.is_control = true
+                end
+
+                if options[:size]
+                  host.box_size = options[:size]
+                end
+
+                if options[:forwarded_port]
+                  guest_port, host_port = Vagrant::Hivemind::Util::Network.port_pair_to_i(options[:forwarded_port])
+                  host.forwarded_ports ||= []
+
+                  port_pair = Vagrant::Hivemind::Util::Network.get_host_port_pair_with_guest_port(guest_port, host)
+                  if port_pair
+                    port_pair["host_port"] = host_port
+                  else
+                    port_pair = {
+                      "guest_port" => guest_port,
+                      "host_port"  => host_port
+                    }
+                    host.forwarded_ports << port_pair
+                  end
+                end
 
                 # 3.
                 hosts.delete options[:hostname]
@@ -131,7 +158,7 @@ module Vagrant
             return "Invalid port pair format!"
           end
 
-          guest_port, host_port = port_pair.split(":").map.each { |n| n.to_i }
+          guest_port, host_port = Vagrant::Hivemind::Util::Network.port_pair_to_i(port_pair)
           if !Vagrant::Hivemind::Util::Network.is_valid_port_value? guest_port
             return "Guest port is out of range!"
           end

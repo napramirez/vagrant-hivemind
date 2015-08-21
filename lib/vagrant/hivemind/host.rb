@@ -12,6 +12,7 @@ module Vagrant
         @is_control = options[:is_control] || false
         @box_size   = options[:box_size]   || :small.to_s
         @box_type   = options[:box_type]   || :server.to_s
+        @forwarded_ports = []
       end
 
       def self.control

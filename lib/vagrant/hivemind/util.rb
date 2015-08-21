@@ -55,6 +55,14 @@ module Vagrant
           port >= 0 and port <= 65535
         end
 
+        def self.port_pair_to_i(port_pair)
+          port_pair.split(":").map.each { |n| n.to_i }
+        end
+
+        def self.get_host_port_pair_with_guest_port(guest_port, host)
+          (host.forwarded_ports.select do |forwarded_port| forwarded_port["guest_port"] == guest_port end).first
+        end
+
         def self.get_host_keys_using_host_port(host_port, hosts)
           hosts.keys.select do |key|
             host = hosts[key]
