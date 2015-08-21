@@ -46,6 +46,12 @@ module Vagrant
           return (Vagrant::Hivemind::Constants::IP_ADDRESS_REGEX =~ ip_address) != nil
         end
 
+        def self.get_network(ip_address)
+          split_ip_address = ip_address.split(".")
+          return nil unless split_ip_address.size == 4
+          split_ip_address[0,3].join(".")
+        end
+
         def self.starting_ip_address
           Vagrant::Hivemind::Constants::PRIVATE_NETWORK_IP_ADDRESS_POOL[0]
         end
