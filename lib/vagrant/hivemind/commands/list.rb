@@ -17,7 +17,7 @@ module Vagrant
             :directory => []
           }
 
-          OptionParser.new do |o|
+          opts = OptionParser.new do |o|
             o.banner = "Usage: vagrant hivemind list [options]"
             o.separator ""
             o.separator "Options:"
@@ -42,7 +42,10 @@ module Vagrant
             o.on("-d", "--directory DIRECTORY", "Specify the directory where '#{Vagrant::Hivemind::Constants::HIVE_FILE}' is located (default: current directory)") do |d|
               options[:directory] << d
             end
-          end.parse!
+          end
+
+          argv = parse_options(opts)
+          return 0 unless argv
 
           work_dir = options[:directory].empty? ? "." : options[:directory].first
 
