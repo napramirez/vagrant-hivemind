@@ -38,25 +38,26 @@ module Vagrant
 
           unless options[:hostname]
             @env.ui.info opts.help
-            return
+            return 0
           end
 
           work_dir = options[:directory].empty? ? "." : options[:directory].first
 
           unless Vagrant::Hivemind::Util::HiveFile.exist? work_dir
-            @env.ui.info "There is no Hive file in the working directory."
-            return
+            @env.ui.error "There is no Hive file in the working directory."
+            return 1
           end
 
           hosts = Vagrant::Hivemind::Util::HiveFile.read_from work_dir
 
-          if hosts.values.map(&:hostname).include? options[:hostname]
-            hosts.delete options[:hostname]
-            Vagrant::Hivemind::Util::HiveFile.write_to hosts, work_dir
-            @env.ui.info "Killed the Drone with hostname '#{options[:hostname]}'"
-          else
-            @env.ui.info "The specified hostname does not exist!"
+          unless hosts.values.map(&:hostname).include? options[:hostname]
+            @env.ui.error "The specified hostname does not exist!"
+            return 1
           end
+
+          hosts.delete options[:hostname]
+          Vagrant::Hivemind::Util::HiveFile.write_to hosts, work_dir
+          @env.ui.info "Killed the Drone with hostname '#{options[:hostname]}'"
 
           0
         end

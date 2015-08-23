@@ -45,13 +45,13 @@ module Vagrant
           end
 
           argv = parse_options(opts)
-          return 0 unless argv
+          return if !argv
 
           work_dir = options[:directory].empty? ? "." : options[:directory].first
 
           unless Vagrant::Hivemind::Util::HiveFile.exist? work_dir
-            @env.ui.info "There is no Hive file in the working directory."
-            return
+            @env.ui.error "There is no Hive file in the working directory."
+            return 1
           end
 
           hosts = Vagrant::Hivemind::Util::HiveFile.read_from work_dir
@@ -76,32 +76,33 @@ module Vagrant
           0
         end
 
-        def sort_hosts(hosts, options = {})
-          sorted_hosts = hosts
-          options.keys.each do |key|
-            sorted_hosts = sort_hosts_by_hostname(hosts)   if key == :hostname
-            sorted_hosts = sort_hosts_by_ip_address(hosts) if key == :ip_address
-            sorted_hosts = sort_hosts_by_control(hosts)    if key == :control
-            sorted_hosts = sort_hosts_by_box_size(hosts)   if key == :size
+        private
+          def sort_hosts(hosts, options = {})
+            sorted_hosts = hosts
+            options.keys.each do |key|
+              sorted_hosts = sort_hosts_by_hostname(hosts)   if key == :hostname
+              sorted_hosts = sort_hosts_by_ip_address(hosts) if key == :ip_address
+              sorted_hosts = sort_hosts_by_control(hosts)    if key == :control
+              sorted_hosts = sort_hosts_by_box_size(hosts)   if key == :size
+            end
+            sorted_hosts
           end
-          sorted_hosts
-        end
 
-        def sort_hosts_by_hostname(hosts)
-          (hosts.sort_by { |k,v| v.hostname }).to_h
-        end
+          def sort_hosts_by_hostname(hosts)
+            (hosts.sort_by { |k,v| v.hostname }).to_h
+          end
 
-        def sort_hosts_by_ip_address(hosts)
-          (hosts.sort_by { |k,v| v.ip_address }).to_h
-        end
+          def sort_hosts_by_ip_address(hosts)
+            (hosts.sort_by { |k,v| v.ip_address }).to_h
+          end
 
-        def sort_hosts_by_control(hosts)
-          (hosts.sort_by { |k,v| v.is_control.to_s }.reverse).to_h
-        end
+          def sort_hosts_by_control(hosts)
+            (hosts.sort_by { |k,v| v.is_control.to_s }.reverse).to_h
+          end
 
-        def sort_hosts_by_box_size(hosts)
-          (hosts.sort_by { |k,v| Vagrant::Hivemind::Constants::BOX_SIZES[v.box_size.to_sym][:memory_in_mb] }).to_h
-        end
+          def sort_hosts_by_box_size(hosts)
+            (hosts.sort_by { |k,v| Vagrant::Hivemind::Constants::BOX_SIZES[v.box_size.to_sym][:memory_in_mb] }).to_h
+          end
 
       end
     end

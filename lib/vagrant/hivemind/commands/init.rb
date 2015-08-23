@@ -37,15 +37,17 @@ module Vagrant
 
           if Vagrant::Hivemind::Util::HiveFile.exist? work_dir
             if options[:force]
-              @env.ui.info "The Hive file has been overwritten."
               write_new_hive_file work_dir
+              @env.ui.info "The Hive file has been overwritten."
+              return 0
             else
-              @env.ui.info "The Hive file already exists!"
+              @env.ui.error "The Hive file already exists!"
+              return 1
             end
-          else
-            @env.ui.info "The Hive file has been created in the working directory."
-            write_new_hive_file work_dir
           end
+
+          write_new_hive_file work_dir
+          @env.ui.info "The Hive file has been created in the working directory."
 
           0
         end
