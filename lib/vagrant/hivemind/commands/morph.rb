@@ -22,7 +22,7 @@ module Vagrant
             :directory      => []
           }
 
-          parser = OptionParser.new do |o|
+          opts = OptionParser.new do |o|
             o.banner = "Usage: vagrant hivemind morph [options]"
             o.separator ""
             o.separator "Options:"
@@ -53,88 +53,90 @@ module Vagrant
             end
           end
 
-          parser.parse!
+          argv = parse_options(opts)
+          return if !argv
 
           work_dir = options[:directory].empty? ? "." : options[:directory].first
 
-          if options[:hostname]
-            if Vagrant::Hivemind::Util::HiveFile.exist? work_dir
-              hosts = Vagrant::Hivemind::Util::HiveFile.read_from work_dir
+          unless options[:hostname]
+            @env.ui.info opts.help
+            return
+          end
 
-              if hosts.values.map(&:hostname).include? options[:hostname]
-                # 0. Validate inputs
-                if options[:ip_address]
-                  validation_error = is_valid_ip_address?(options[:ip_address], hosts)
-                  if validation_error
-                    @env.ui.info validation_error
-                    return 1
-                  end
-                end
+          unless Vagrant::Hivemind::Util::HiveFile.exist? work_dir
+            @env.ui.info "There is no Hive file in the working directory."
+            return
+          end
 
-                if options[:forwarded_port]
-                  validation_error = is_valid_forwarded_port?(options[:forwarded_port], hosts)
-                  if validation_error
-                    @env.ui.info validation_error
-                    return 1
-                  end
-                end
+          hosts = Vagrant::Hivemind::Util::HiveFile.read_from work_dir
 
-                # TODO: Morph!
-                # 1. Get Drone
-                # 2. Modify Drone
-                # 3. Detach Drone from hosts
-                # 4. Re-attach morphed Drone
-
-                # 1.
-                host = hosts[options[:hostname]]
-
-                # 2.
-                if options[:ip_address]
-                  host.ip_address = options[:ip_address]
-                end
-
-                if options[:control]
-                  host.is_control = true
-                end
-
-                if options[:size]
-                  host.box_size = options[:size]
-                end
-
-                if options[:forwarded_port]
-                  guest_port, host_port = Vagrant::Hivemind::Util::Network.port_pair_to_i(options[:forwarded_port])
-                  host.forwarded_ports ||= []
-
-                  port_pair = Vagrant::Hivemind::Util::Network.get_host_port_pair_with_guest_port(guest_port, host)
-                  if port_pair
-                    port_pair["host_port"] = host_port
-                  else
-                    port_pair = {
-                      "guest_port" => guest_port,
-                      "host_port"  => host_port
-                    }
-                    host.forwarded_ports << port_pair
-                  end
-                end
-
-                # 3.
-                hosts.delete options[:hostname]
-
-                # 4.
-                drone = {
-                  options[:hostname] => host
-                }
-                Vagrant::Hivemind::Util::HiveFile.write_to hosts.merge(drone), work_dir
-                @env.ui.info "Morphed the Drone with hostname '#{options[:hostname]}'"
-              else
-                @env.ui.info "The specified hostname does not exist!"
-              end
-
-            else
-              @env.ui.info "There is no Hive file in the working directory."
-            end
+          unless hosts.values.map(&:hostname).include? options[:hostname]
+            @env.ui.info "The specified hostname does not exist!"
           else
-            parser.parse %w[--help]
+            # 0. Validate inputs
+            if options[:ip_address]
+              validation_error = is_valid_ip_address?(options[:ip_address], hosts)
+              if validation_error
+                @env.ui.info validation_error
+                return 1
+              end
+            end
+
+            if options[:forwarded_port]
+              validation_error = is_valid_forwarded_port?(options[:forwarded_port], hosts)
+              if validation_error
+                @env.ui.info validation_error
+                return 1
+              end
+            end
+
+            # TODO: Morph!
+            # 1. Get Drone
+            # 2. Modify Drone
+            # 3. Detach Drone from hosts
+            # 4. Re-attach morphed Drone
+
+            # 1.
+            host = hosts[options[:hostname]]
+
+            # 2.
+            if options[:ip_address]
+              host.ip_address = options[:ip_address]
+            end
+
+            if options[:control]
+              host.is_control = true
+            end
+
+            if options[:size]
+              host.box_size = options[:size]
+            end
+
+            if options[:forwarded_port]
+              guest_port, host_port = Vagrant::Hivemind::Util::Network.port_pair_to_i(options[:forwarded_port])
+              host.forwarded_ports ||= []
+
+              port_pair = Vagrant::Hivemind::Util::Network.get_host_port_pair_with_guest_port(guest_port, host)
+              if port_pair
+                port_pair["host_port"] = host_port
+              else
+                port_pair = {
+                  "guest_port" => guest_port,
+                  "host_port"  => host_port
+                }
+                host.forwarded_ports << port_pair
+              end
+            end
+
+            # 3.
+            hosts.delete options[:hostname]
+
+            # 4.
+            drone = {
+              options[:hostname] => host
+            }
+            Vagrant::Hivemind::Util::HiveFile.write_to hosts.merge(drone), work_dir
+            @env.ui.info "Morphed the Drone with hostname '#{options[:hostname]}'"
           end
 
           0

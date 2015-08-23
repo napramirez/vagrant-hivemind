@@ -49,28 +49,29 @@ module Vagrant
 
           work_dir = options[:directory].empty? ? "." : options[:directory].first
 
-          if Vagrant::Hivemind::Util::HiveFile.exist? work_dir
-            hosts = Vagrant::Hivemind::Util::HiveFile.read_from work_dir
-
-            sorted_hosts = sort_hosts hosts, options
-
-            @env.ui.info "+----------------------+----------------+---+--------------+------------+---+"
-            @env.ui.info "| Hostname             | IP Address     | C | Size         | Box Type   | G |"
-            @env.ui.info "+----------------------+----------------+---+--------------+------------+---+"
-            sorted_hosts.values.each do |host|
-              hostname       = host.hostname
-              ip_address     = host.ip_address
-              is_control_y_n = host.is_control ? 'Y' : 'N'
-              box_size       = Vagrant::Hivemind::Constants::BOX_SIZES[host.box_size.to_sym][:name]
-              box_type       = Vagrant::Hivemind::Constants::BOX_TYPES[host.box_type.to_sym][:name]
-              is_gui_y_n     = Vagrant::Hivemind::Constants::BOX_TYPES[host.box_type.to_sym][:is_gui] ? 'Y' : 'N'
-              @env.ui.info "| #{'%-20.20s' % hostname} | #{'%-14.14s' % ip_address} | #{is_control_y_n} | #{'%-12.12s' % box_size} | #{'%-10.10s' % box_type} | #{is_gui_y_n} |"
-            end
-            @env.ui.info "+----------------------+----------------+---+--------------+------------+---+"
-
-          else
+          unless Vagrant::Hivemind::Util::HiveFile.exist? work_dir
             @env.ui.info "There is no Hive file in the working directory."
+            return
           end
+
+          hosts = Vagrant::Hivemind::Util::HiveFile.read_from work_dir
+
+          sorted_hosts = sort_hosts hosts, options
+
+          @env.ui.info "+----------------------+----------------+---+--------------+------------+---+"
+          @env.ui.info "| Hostname             | IP Address     | C | Size         | Box Type   | G |"
+          @env.ui.info "+----------------------+----------------+---+--------------+------------+---+"
+          sorted_hosts.values.each do |host|
+            hostname       = host.hostname
+            ip_address     = host.ip_address
+            is_control_y_n = host.is_control ? 'Y' : 'N'
+            box_size       = Vagrant::Hivemind::Constants::BOX_SIZES[host.box_size.to_sym][:name]
+            box_type       = Vagrant::Hivemind::Constants::BOX_TYPES[host.box_type.to_sym][:name]
+            is_gui_y_n     = Vagrant::Hivemind::Constants::BOX_TYPES[host.box_type.to_sym][:is_gui] ? 'Y' : 'N'
+            @env.ui.info "| #{'%-20.20s' % hostname} | #{'%-14.14s' % ip_address} | #{is_control_y_n} | #{'%-12.12s' % box_size} | #{'%-10.10s' % box_type} | #{is_gui_y_n} |"
+          end
+          @env.ui.info "+----------------------+----------------+---+--------------+------------+---+"
+          @env.ui.info ""
 
           0
         end

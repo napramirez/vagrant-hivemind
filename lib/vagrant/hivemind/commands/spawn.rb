@@ -21,7 +21,7 @@ module Vagrant
             :directory => []
           }
 
-          parser = OptionParser.new do |o|
+          opts = OptionParser.new do |o|
             o.banner = "Usage: vagrant hivemind spawn [options]"
             o.separator ""
             o.separator "Options:"
@@ -48,40 +48,42 @@ module Vagrant
             end
           end
 
-          parser.parse!
+          argv = parse_options(opts)
+          return if !argv
+
+          unless options[:hostname]
+            @env.ui.info opts.help
+            return
+          end
 
           work_dir = options[:directory].empty? ? "." : options[:directory].first
 
-          if options[:hostname]
-            if Vagrant::Hivemind::Util::HiveFile.exist? work_dir
-              hosts = Vagrant::Hivemind::Util::HiveFile.read_from work_dir
+          unless Vagrant::Hivemind::Util::HiveFile.exist? work_dir
+            @env.ui.info "There is no Hive file in the working directory."
+            return
+          end
 
-              if hosts.values.map(&:hostname).include? options[:hostname]
-                @env.ui.info "The specified hostname already exists!"
-              else
-                if Vagrant::Hivemind::Util::Network.is_valid_hostname? options[:hostname]
-                  drone = {
-                    options[:hostname] => Vagrant::Hivemind::Host.new(
-                      options[:hostname],
-                      Vagrant::Hivemind::Util::Network.next_ip_address(hosts),
-                      {
-                        is_control: options[:control],
-                        box_size:   options[:size],
-                        box_type:   options[:type]
-                      })
-                  }
-                  Vagrant::Hivemind::Util::HiveFile.write_to hosts.merge(drone), work_dir
-                  @env.ui.info "Spawned the Drone with hostname '#{options[:hostname]}'"
-                else
-                  @env.ui.info "Invalid hostname format!"
-                end
-              end
+          hosts = Vagrant::Hivemind::Util::HiveFile.read_from work_dir
 
-            else
-              @env.ui.info "There is no Hive file in the working directory."
-            end
+          if hosts.values.map(&:hostname).include? options[:hostname]
+            @env.ui.info "The specified hostname already exists!"
           else
-            parser.parse %w[--help]
+            if Vagrant::Hivemind::Util::Network.is_valid_hostname? options[:hostname]
+              drone = {
+                options[:hostname] => Vagrant::Hivemind::Host.new(
+                  options[:hostname],
+                  Vagrant::Hivemind::Util::Network.next_ip_address(hosts),
+                  {
+                    is_control: options[:control],
+                    box_size:   options[:size],
+                    box_type:   options[:type]
+                  })
+              }
+              Vagrant::Hivemind::Util::HiveFile.write_to hosts.merge(drone), work_dir
+              @env.ui.info "Spawned the Drone with hostname '#{options[:hostname]}'"
+            else
+              @env.ui.info "Invalid hostname format!"
+            end
           end
 
           0
