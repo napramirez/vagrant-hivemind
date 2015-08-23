@@ -44,7 +44,7 @@ module Vagrant
             return 0
           end
 
-          work_dir = options[:directory].empty? ? "." : options[:directory].first
+          work_dir = get_work_dir_from_options options
 
           unless HiveFile.exist? work_dir
             @env.ui.error "There is no Hive file in the working directory."
@@ -78,6 +78,12 @@ module Vagrant
 
           0
         end
+
+        private
+          def get_work_dir_from_options(options)
+            options[:directory].empty? ? "." : options[:directory].first
+          end
+
       end
     end
   end

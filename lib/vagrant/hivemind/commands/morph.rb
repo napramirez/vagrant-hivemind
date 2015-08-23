@@ -59,7 +59,7 @@ module Vagrant
           argv = parse_options(opts)
           return if !argv
 
-          work_dir = options[:directory].empty? ? "." : options[:directory].first
+          work_dir = get_work_dir_from_options options
 
           unless options[:hostname]
             @env.ui.info opts.help
@@ -135,6 +135,10 @@ module Vagrant
         end
 
         private
+          def get_work_dir_from_options(options)
+            options[:directory].empty? ? "." : options[:directory].first
+          end
+
           def is_valid_ip_address?(ip_address, hosts)
             if !Network.is_valid_ip_address? ip_address
               return "Invalid IP address format!"

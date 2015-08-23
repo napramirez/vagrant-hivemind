@@ -50,7 +50,7 @@ module Vagrant
           argv = parse_options(opts)
           return if !argv
 
-          work_dir = options[:directory].empty? ? "." : options[:directory].first
+          work_dir = get_work_dir_from_options options
 
           unless HiveFile.exist? work_dir
             @env.ui.error "There is no Hive file in the working directory."
@@ -80,6 +80,10 @@ module Vagrant
         end
 
         private
+          def get_work_dir_from_options(options)
+            options[:directory].empty? ? "." : options[:directory].first
+          end
+
           def sort_hosts(hosts, options = {})
             sorted_hosts = hosts
             options.keys.each do |key|

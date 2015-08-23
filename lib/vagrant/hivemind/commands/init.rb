@@ -36,7 +36,7 @@ module Vagrant
             end
           end.parse!
 
-          work_dir = options[:directory].empty? ? "." : options[:directory].first
+          work_dir = get_work_dir_from_options options
 
           if HiveFile.exist? work_dir
             if options[:force]
@@ -55,12 +55,18 @@ module Vagrant
           0
         end
 
-        def write_new_hive_file(work_dir)
-          hosts = {
-            "control" => Vagrant::Hivemind::Host.control
-          }
-          HiveFile.write_to hosts, work_dir
-        end
+        private
+          def get_work_dir_from_options(options)
+            options[:directory].empty? ? "." : options[:directory].first
+          end
+
+          def write_new_hive_file(work_dir)
+            hosts = {
+              "control" => Vagrant::Hivemind::Host.control
+            }
+            HiveFile.write_to hosts, work_dir
+          end
+
       end
     end
   end
