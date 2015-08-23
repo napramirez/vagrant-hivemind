@@ -8,8 +8,11 @@ module Vagrant
   module Hivemind
     module Command
       class Init < Vagrant.plugin("2", :command)
+          include Vagrant::Hivemind::Constants
+          include Vagrant::Hivemind::Util
+
         def self.synopsis
-          "Initializes a new Hive by creating a '#{Vagrant::Hivemind::Constants::HIVE_FILE}'"
+          "Initializes a new Hive by creating a '#{HIVE_FILE}'"
         end
 
         def execute
@@ -24,18 +27,18 @@ module Vagrant
             o.separator "Options:"
             o.separator ""
 
-            o.on("-f", "--force", "Overwrite an existing '#{Vagrant::Hivemind::Constants::HIVE_FILE}' with a new one") do |f|
+            o.on("-f", "--force", "Overwrite an existing '#{HIVE_FILE}' with a new one") do |f|
               options[:force] = f
             end
 
-            o.on("-d", "--directory DIRECTORY", "Specify the directory where '#{Vagrant::Hivemind::Constants::HIVE_FILE}' will be created (default: current directory)") do |d|
+            o.on("-d", "--directory DIRECTORY", "Specify the directory where '#{HIVE_FILE}' will be created (default: current directory)") do |d|
               options[:directory] << d
             end
           end.parse!
 
           work_dir = options[:directory].empty? ? "." : options[:directory].first
 
-          if Vagrant::Hivemind::Util::HiveFile.exist? work_dir
+          if HiveFile.exist? work_dir
             if options[:force]
               write_new_hive_file work_dir
               @env.ui.info "The Hive file has been overwritten."
@@ -56,7 +59,7 @@ module Vagrant
           hosts = {
             "control" => Vagrant::Hivemind::Host.control
           }
-          Vagrant::Hivemind::Util::HiveFile.write_to hosts, work_dir
+          HiveFile.write_to hosts, work_dir
         end
       end
     end

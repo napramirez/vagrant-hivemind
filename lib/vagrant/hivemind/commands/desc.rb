@@ -8,6 +8,9 @@ module Vagrant
   module Hivemind
     module Command
       class Desc < Vagrant.plugin("2", :command)
+          include Vagrant::Hivemind::Constants
+          include Vagrant::Hivemind::Util
+
         def self.synopsis
           "Displays the settings of a Drone in the Hive"
         end
@@ -28,7 +31,7 @@ module Vagrant
               options[:hostname] = n
             end
 
-            o.on("-d", "--directory DIRECTORY", "Specify the directory where '#{Vagrant::Hivemind::Constants::HIVE_FILE}' is located (default: current directory)") do |d|
+            o.on("-d", "--directory DIRECTORY", "Specify the directory where '#{HIVE_FILE}' is located (default: current directory)") do |d|
               options[:directory] << d
             end
           end
@@ -43,12 +46,12 @@ module Vagrant
 
           work_dir = options[:directory].empty? ? "." : options[:directory].first
 
-          unless Vagrant::Hivemind::Util::HiveFile.exist? work_dir
+          unless HiveFile.exist? work_dir
             @env.ui.error "There is no Hive file in the working directory."
             return 1
           end
 
-          hosts = Vagrant::Hivemind::Util::HiveFile.read_from work_dir
+          hosts = HiveFile.read_from work_dir
 
           unless hosts.values.map(&:hostname).include? options[:hostname]
             @env.ui.error "The specified hostname does not exist!"
@@ -60,9 +63,9 @@ module Vagrant
           @env.ui.info "Hostname        : #{host.hostname}"
           @env.ui.info "IP Address      : #{host.ip_address}"
           @env.ui.info "Control Machine : #{host.is_control ? 'Yes' : 'No'}"
-          @env.ui.info "Box Size        : #{Vagrant::Hivemind::Constants::BOX_SIZES[host.box_size.to_sym][:name]} (#{Vagrant::Hivemind::Constants::BOX_SIZES[host.box_size.to_sym][:memory_in_mb]}MB)"
-          @env.ui.info "Box Type        : #{Vagrant::Hivemind::Constants::BOX_TYPES[host.box_type.to_sym][:name]} (#{Vagrant::Hivemind::Constants::BOX_TYPES[host.box_type.to_sym][:box_id]})"
-          @env.ui.info "GUI Machine     : #{Vagrant::Hivemind::Constants::BOX_TYPES[host.box_type.to_sym][:is_gui] ? 'Yes' : 'No'}"
+          @env.ui.info "Box Size        : #{BOX_SIZES[host.box_size.to_sym][:name]} (#{BOX_SIZES[host.box_size.to_sym][:memory_in_mb]}MB)"
+          @env.ui.info "Box Type        : #{BOX_TYPES[host.box_type.to_sym][:name]} (#{BOX_TYPES[host.box_type.to_sym][:box_id]})"
+          @env.ui.info "GUI Machine     : #{BOX_TYPES[host.box_type.to_sym][:is_gui] ? 'Yes' : 'No'}"
           @env.ui.info ""
 
           if host.forwarded_ports and !host.forwarded_ports.empty?

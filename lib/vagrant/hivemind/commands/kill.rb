@@ -8,6 +8,9 @@ module Vagrant
   module Hivemind
     module Command
       class Kill < Vagrant.plugin("2", :command)
+          include Vagrant::Hivemind::Constants
+          include Vagrant::Hivemind::Util
+
         def self.synopsis
           "Removes a Drone in the Hive"
         end
@@ -28,7 +31,7 @@ module Vagrant
               options[:hostname] = n
             end
 
-            o.on("-d", "--directory DIRECTORY", "Specify the directory where '#{Vagrant::Hivemind::Constants::HIVE_FILE}' is located (default: current directory)") do |d|
+            o.on("-d", "--directory DIRECTORY", "Specify the directory where '#{HIVE_FILE}' is located (default: current directory)") do |d|
               options[:directory] << d
             end
           end
@@ -43,12 +46,12 @@ module Vagrant
 
           work_dir = options[:directory].empty? ? "." : options[:directory].first
 
-          unless Vagrant::Hivemind::Util::HiveFile.exist? work_dir
+          unless HiveFile.exist? work_dir
             @env.ui.error "There is no Hive file in the working directory."
             return 1
           end
 
-          hosts = Vagrant::Hivemind::Util::HiveFile.read_from work_dir
+          hosts = HiveFile.read_from work_dir
 
           unless hosts.values.map(&:hostname).include? options[:hostname]
             @env.ui.error "The specified hostname does not exist!"
@@ -56,7 +59,7 @@ module Vagrant
           end
 
           hosts.delete options[:hostname]
-          Vagrant::Hivemind::Util::HiveFile.write_to hosts, work_dir
+          HiveFile.write_to hosts, work_dir
           @env.ui.info "Killed the Drone with hostname '#{options[:hostname]}'"
 
           0

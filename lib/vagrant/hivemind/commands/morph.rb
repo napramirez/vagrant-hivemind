@@ -8,6 +8,9 @@ module Vagrant
   module Hivemind
     module Command
       class Morph < Vagrant.plugin("2", :command)
+          include Vagrant::Hivemind::Constants
+          include Vagrant::Hivemind::Util
+
         def self.synopsis
           "Changes the settings of a Drone in the Hive"
         end
@@ -40,7 +43,7 @@ module Vagrant
               options[:control] = c
             end
 
-            o.on("-s", "--size SIZE", Vagrant::Hivemind::Constants::BOX_SIZES.keys.map(&:to_s), "The new Box Size of the Drone [:extra_small, :small, :medium, :large, :extra_large] (default: :small)") do |s|
+            o.on("-s", "--size SIZE", BOX_SIZES.keys.map(&:to_s), "The new Box Size of the Drone [:extra_small, :small, :medium, :large, :extra_large] (default: :small)") do |s|
               options[:size] = s
             end
 
@@ -48,7 +51,7 @@ module Vagrant
               options[:forwarded_port] = p
             end
 
-            o.on("-d", "--directory DIRECTORY", "Specify the directory where '#{Vagrant::Hivemind::Constants::HIVE_FILE}' is located (default: current directory)") do |d|
+            o.on("-d", "--directory DIRECTORY", "Specify the directory where '#{HIVE_FILE}' is located (default: current directory)") do |d|
               options[:directory] << d
             end
           end
@@ -63,12 +66,12 @@ module Vagrant
             return 0
           end
 
-          unless Vagrant::Hivemind::Util::HiveFile.exist? work_dir
+          unless HiveFile.exist? work_dir
             @env.ui.error "There is no Hive file in the working directory."
             return 1
           end
 
-          hosts = Vagrant::Hivemind::Util::HiveFile.read_from work_dir
+          hosts = HiveFile.read_from work_dir
 
           unless hosts.values.map(&:hostname).include? options[:hostname]
             @env.ui.error "The specified hostname does not exist!"
@@ -106,10 +109,10 @@ module Vagrant
           end
 
           if options[:forwarded_port]
-            guest_port, host_port = Vagrant::Hivemind::Util::Network.port_pair_to_i(options[:forwarded_port])
+            guest_port, host_port = Network.port_pair_to_i(options[:forwarded_port])
             host.forwarded_ports ||= []
 
-            port_pair = Vagrant::Hivemind::Util::Network.get_host_port_pair_with_guest_port(guest_port, host)
+            port_pair = Network.get_host_port_pair_with_guest_port(guest_port, host)
             if port_pair
               port_pair["host_port"] = host_port
             else
@@ -125,7 +128,7 @@ module Vagrant
           drone = {
             options[:hostname] => host
           }
-          Vagrant::Hivemind::Util::HiveFile.write_to hosts.merge(drone), work_dir
+          HiveFile.write_to hosts.merge(drone), work_dir
           @env.ui.info "Morphed the Drone with hostname '#{options[:hostname]}'"
 
           0
@@ -133,10 +136,10 @@ module Vagrant
 
         private
           def is_valid_ip_address?(ip_address, hosts)
-            if !Vagrant::Hivemind::Util::Network.is_valid_ip_address? ip_address
+            if !Network.is_valid_ip_address? ip_address
               return "Invalid IP address format!"
             end
-            if Vagrant::Hivemind::Util::Network.get_network(ip_address) != Vagrant::Hivemind::Util::Network.get_network(Vagrant::Hivemind::Constants::PRIVATE_NETWORK)
+            if Network.get_network(ip_address) != Network.get_network(PRIVATE_NETWORK)
               return "The specified IP address does not belong to the private network of the Hive!"
             end
             if hosts.values.map(&:ip_address).include? ip_address
@@ -146,19 +149,19 @@ module Vagrant
           end
 
           def is_valid_forwarded_port?(port_pair, hosts)
-            if !Vagrant::Hivemind::Util::Network.is_valid_port_pair? port_pair
+            if !Network.is_valid_port_pair? port_pair
               return "Invalid port pair format!"
             end
 
-            guest_port, host_port = Vagrant::Hivemind::Util::Network.port_pair_to_i(port_pair)
-            if !Vagrant::Hivemind::Util::Network.is_valid_port_value? guest_port
+            guest_port, host_port = Network.port_pair_to_i(port_pair)
+            if !Network.is_valid_port_value? guest_port
               return "Guest port is out of range!"
             end
-            if !Vagrant::Hivemind::Util::Network.is_valid_port_value? host_port
+            if !Network.is_valid_port_value? host_port
               return "Host port is out of range!"
             end
 
-            if Vagrant::Hivemind::Util::Network.get_host_keys_using_host_port(host_port, hosts).size > 0
+            if Network.get_host_keys_using_host_port(host_port, hosts).size > 0
               return "Host port is already used!"
             end
           end
