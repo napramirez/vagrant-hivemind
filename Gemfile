@@ -10,3 +10,5 @@ end
 group :plugins do
   gem "vagrant-hivemind", path: "."
 end
+
+gem 'pry'
