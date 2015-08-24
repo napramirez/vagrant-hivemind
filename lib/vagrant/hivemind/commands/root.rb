@@ -45,6 +45,11 @@ module Vagrant
             Morph
           end
 
+          @subcommands.register(:up) do
+            require_relative "up"
+            Up
+          end
+
         end
 
         def execute
