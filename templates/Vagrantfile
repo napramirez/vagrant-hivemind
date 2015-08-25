@@ -1,28 +1,26 @@
-def apply_host_config(host)
-  Vagrant.configure(2) do |config|
-    config.vm.define host.hostname do |host_config|
-      host_config.vm.box = host.box
-      host_config.vm.network "private_network", ip: host.ip_address, virtualbox__intnet: true
+Vagrant.configure(2) do |config|
+  config.vm.define "<%= host.hostname %>" do |host_config|
+    host_config.vm.box = "<%= box_types[host.box_type.to_sym][:box_id] %>"
+    host_config.vm.network "private_network", ip: "<%= host.ip_address %>", virtualbox__intnet: true
 
-      host_config.vm.provider "virtualbox" do |vb|
-        vb.memory = host.memory_in_mb
-        vb.gui = host.is_gui
-      end
-
-      host_config.vm.synced_folder "cache/apt", "/var/cache/apt/archives", create: true
-      host_config.vm.provision "shell" do |s|
-        s.path = "scripts/setup-hostname.sh"
-        s.args = ["#{host.hostname.to_s}"]
-      end
-
-      if host.is_control
-        host_config.vm.provision "shell", path: "scripts/setup-control-ssh.sh"
-        host_config.vm.provision "shell", path: "scripts/install-ansible.sh"
-        host_config.vm.provision "shell", path: "scripts/post-install-ansible.sh"
-      end
-
-      host_config.vm.provision "shell", path: "scripts/setup-drone-ssh.sh"
-      host_config.vm.provision "shell", path: "scripts/update-system-hosts.sh"
+    host_config.vm.provider "virtualbox" do |vb|
+      vb.memory = "<%= box_sizes[host.box_size.to_sym][:memory_in_mb] %>"
+      vb.gui = "<%= box_types[host.box_type.to_sym][:is_gui] %>"
     end
+
+    host_config.vm.synced_folder "cache/apt", "/var/cache/apt/archives", create: true
+    host_config.vm.provision "shell" do |s|
+      s.path = "scripts/setup-hostname.sh"
+      s.args = ["<%= host.hostname %>"]
+    end
+
+    if "<%= host.is_control %>" == "true"
+      host_config.vm.provision "shell", path: "scripts/setup-control-ssh.sh"
+      host_config.vm.provision "shell", path: "scripts/install-ansible.sh"
+      host_config.vm.provision "shell", path: "scripts/post-install-ansible.sh"
+    end
+
+    host_config.vm.provision "shell", path: "scripts/setup-drone-ssh.sh"
+    host_config.vm.provision "shell", path: "scripts/update-system-hosts.sh"
   end
 end

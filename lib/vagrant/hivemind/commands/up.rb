@@ -1,5 +1,5 @@
 require "optparse"
-require "pry"
+require "erb"
 
 require "vagrant/hivemind/constants"
 require "vagrant/hivemind/util"
@@ -59,8 +59,25 @@ module Vagrant
             return 1
           end
 
-          @env.config_loader.set :hivemind, File.expand_path("../../../../../templates/Vagrantfile", __FILE__)
-          binding.pry
+          host = hosts[options[:hostname]]
+
+          template_string = ""
+          File.open(File.expand_path("../../../../../templates/Vagrantfile", __FILE__), "r") do |f|
+            template_string = f.read
+          end
+
+          template = ERB.new template_string
+          template_result = template.result(get_binding(host, BOX_TYPES, BOX_SIZES))
+
+          tf = Tempfile.new("Hivemind_Vagrantfile")
+          tf.write template_result
+          tf.close
+
+          @env.define_singleton_method :vagrantfile_name= do |vfn| @vagrantfile_name = vfn end
+          @env.define_singleton_method :root_path= do |root_path| @root_path = root_path end
+          @env.vagrantfile_name = [File.basename(tf)]
+          @env.root_path = Pathname.new Dir.tmpdir
+          #@env.config_loader.set :root, tf.path
 
           machines = []
           @env.batch do |batch|
@@ -98,6 +115,10 @@ module Vagrant
         private
           def get_work_dir_from_options(options)
             options[:directory].empty? ? "." : options[:directory].first
+          end
+
+          def get_binding(host, box_types, box_sizes)
+            return binding
           end
 
       end
