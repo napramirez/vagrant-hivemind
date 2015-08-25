@@ -69,14 +69,16 @@ module Vagrant
           template = ERB.new template_string
           template_result = template.result(get_binding(host, BOX_TYPES, BOX_SIZES))
 
-          tf = Tempfile.new("Hivemind_Vagrantfile")
+          tf = Tempfile.new("Hivemind_Vagrantfile", Dir.pwd)
           tf.write template_result
           tf.close
 
           @env.define_singleton_method :vagrantfile_name= do |vfn| @vagrantfile_name = vfn end
           @env.define_singleton_method :root_path= do |root_path| @root_path = root_path end
+          @env.define_singleton_method :local_data_path= do |local_data_path| @local_data_path = local_data_path end
           @env.vagrantfile_name = [File.basename(tf)]
           @env.root_path = Pathname.new Dir.tmpdir
+          @env.local_data_path = @env.root_path.join ".vagrant"
           #@env.config_loader.set :root, tf.path
 
           machines = []

@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["napramirez@gmail.com"]
 
   spec.summary       = "Vagrant extension directives for the Hivemind platform"
-  spec.description   = %q{TODO: Write a longer description or delete this line.}
+  spec.description   = "Vagrant extension directives for the Hivemind platform..."
   spec.homepage      = "https://github.com/napramirez/vagrant-hivemind"
   spec.license       = "MIT"
 
