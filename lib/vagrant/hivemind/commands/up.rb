@@ -68,10 +68,10 @@ module Vagrant
 
           cache_dir = Pathname.new(Dir.tmpdir).join("hivemind")
           Dir.mkdir cache_dir unless cache_dir.exist?
-          scripts_path = File.expand_path("../../../../../scripts", __FILE__)
+          hivemind_home_dir = File.expand_path("../../../../../", __FILE__)
 
           template = ERB.new template_string
-          template_result = template.result(get_binding(host, BOX_TYPES, BOX_SIZES, cache_dir, scripts_path))
+          template_result = template.result(get_binding(host, BOX_TYPES, BOX_SIZES, cache_dir, hivemind_home_dir))
 
           tf = Tempfile.new("Hivemind_Vagrantfile", Dir.pwd)
           tf.write template_result
@@ -123,7 +123,7 @@ module Vagrant
             options[:directory].empty? ? "." : options[:directory].first
           end
 
-          def get_binding(host, box_types, box_sizes, cache_dir, scripts_path)
+          def get_binding(host, box_types, box_sizes, cache_dir, hivemind_home_dir)
             return binding
           end
 
