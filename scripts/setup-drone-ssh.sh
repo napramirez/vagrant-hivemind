@@ -1,4 +1,4 @@
 #!/bin/bash
 #
 
-cat /vagrant/ssh/id_rsa.pub >> /home/vagrant/.ssh/authorized_keys
+cat /home/vagrant/.ssh/control_id_rsa.pub >> /home/vagrant/.ssh/authorized_keys

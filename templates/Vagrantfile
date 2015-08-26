@@ -17,7 +17,7 @@ Vagrant.configure(2) do |config|
     if "<%= host.is_control %>" == "true"
       # Setup Control Machine SSH
       # 1. Copy the private key
-      host_config.vm.provision "file", source: "<%= hivemind_home_dir %>/keys/id_rsa", destination: "/home/vagrant/.ssh/"
+      host_config.vm.provision "file", source: "<%= hivemind_home_dir %>/keys/id_rsa", destination: "/home/vagrant/.ssh/id_rsa"
 
       # 2. Set the right permissions of the SSH directory and private key
       host_config.vm.provision "shell", path: "<%= hivemind_home_dir %>/scripts/setup-control-ssh.sh"
@@ -26,7 +26,13 @@ Vagrant.configure(2) do |config|
       host_config.vm.provision "shell", path: "<%= hivemind_home_dir %>/scripts/post-install-ansible.sh"
     end
 
+    # Setup Drone SSH
+    # 1. Copy the Control Machine public key
+    host_config.vm.provision "file", source: "<%= hivemind_home_dir %>/keys/id_rsa.pub", destination: "/home/vagrant/.ssh/control_id_rsa.pub"
+
+    # Add the Control Machine public key to the authorized_keys file
     host_config.vm.provision "shell", path: "<%= hivemind_home_dir %>/scripts/setup-drone-ssh.sh"
-    host_config.vm.provision "shell", path: "<%= hivemind_home_dir %>/scripts/update-system-hosts.sh"
+
+    #host_config.vm.provision "shell", path: "<%= hivemind_home_dir %>/scripts/update-system-hosts.sh"
   end
 end
