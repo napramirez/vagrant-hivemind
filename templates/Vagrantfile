@@ -22,10 +22,12 @@ Vagrant.configure(2) do |config|
       # 2. Set the right permissions of the SSH directory and private key
       host_config.vm.provision "shell", path: "<%= hivemind_home_dir %>/scripts/setup-control-ssh.sh"
 
+      # Setup Ansible in the Control Machine
+      # 1. Install Ansible from the PPA
       host_config.vm.provision "shell", path: "<%= hivemind_home_dir %>/scripts/install-ansible.sh"
 
-      # 3. Copy the Ansible hosts file
-      host_config.vm.provision "file", source: "<%= cache_dir %>/cache/ansible.hosts", destination: "/etc/ansible/hosts"
+      # 2. Copy the Ansible hosts file
+      #host_config.vm.provision "file", source: "<%= cache_dir %>/cache/ansible.hosts", destination: "/etc/ansible/hosts"
     end
 
     # Setup Drone SSH
