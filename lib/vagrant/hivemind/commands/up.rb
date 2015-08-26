@@ -45,7 +45,7 @@ module Vagrant
             return 0
           end
 
-          work_dir = get_work_dir_from_options options
+          work_dir = Path.root_path(get_work_dir_from_options(options))
 
           unless HiveFile.exist? work_dir
             @env.ui.error "There is no Hive file in the working directory."
@@ -61,14 +61,14 @@ module Vagrant
 
           host = hosts[options[:hostname]]
 
-          hivemind_vagrantfile_name = Vagrant::Hivemind::Util::Vagrantfile.generate_hivemind_vagrantfile host
+          hivemind_vagrantfile_name = Vagrant::Hivemind::Util::Vagrantfile.generate_hivemind_vagrantfile host, work_dir
 
           @env.define_singleton_method :vagrantfile_name= do |vfn| @vagrantfile_name = vfn end
           @env.define_singleton_method :root_path= do |root_path| @root_path = root_path end
           @env.define_singleton_method :local_data_path= do |local_data_path| @local_data_path = local_data_path end
           @env.vagrantfile_name = [hivemind_vagrantfile_name]
-          @env.root_path = Path.root_path
-          @env.local_data_path = Path.local_data_path
+          @env.root_path = work_dir
+          @env.local_data_path = Path.local_data_path work_dir
           #@env.config_loader.set :root, tf.path
 
           machines = []
