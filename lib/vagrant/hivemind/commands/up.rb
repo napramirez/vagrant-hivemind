@@ -66,12 +66,8 @@ module Vagrant
             template_string = f.read
           end
 
-          cache_dir = Pathname.new(Dir.tmpdir).join("hivemind")
-          Dir.mkdir cache_dir unless cache_dir.exist?
-          hivemind_home_dir = File.expand_path("../../../../../", __FILE__)
-
           template = ERB.new template_string
-          template_result = template.result(get_binding(host, BOX_TYPES, BOX_SIZES, cache_dir, hivemind_home_dir))
+          template_result = template.result(get_binding(host, BOX_TYPES, BOX_SIZES, Path.cache_path, Path.hivemind_home_path))
 
           tf = Tempfile.new("Hivemind_Vagrantfile", Dir.pwd)
           tf.write template_result
@@ -81,8 +77,8 @@ module Vagrant
           @env.define_singleton_method :root_path= do |root_path| @root_path = root_path end
           @env.define_singleton_method :local_data_path= do |local_data_path| @local_data_path = local_data_path end
           @env.vagrantfile_name = [File.basename(tf)]
-          @env.root_path = Pathname.new Dir.pwd
-          @env.local_data_path = @env.root_path.join ".vagrant"
+          @env.root_path = Path.root_path
+          @env.local_data_path = Path.local_data_path
           #@env.config_loader.set :root, tf.path
 
           machines = []

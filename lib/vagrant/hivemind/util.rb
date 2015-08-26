@@ -105,6 +105,26 @@ module Vagrant
         end
       end
 
+      class Path
+        def self.cache_path
+          cache_path = Pathname.new(Dir.tmpdir).join "hivemind"
+          Dir.mkdir cache_path unless cache_path.directory?
+          cache_path
+        end
+
+        def self.hivemind_home_path
+          Pathname.new File.expand_path("../../../../", __FILE__)
+        end
+
+        def self.root_path
+          Pathname.new Dir.pwd
+        end
+
+        def self.local_data_path
+          root_path.join ".vagrant"
+        end
+      end
+
       class Ansible
         def self.generate_hosts_file(hosts = {}, path = ".")
           datetime_now = DateTime.now.strftime "%F %T %p"
