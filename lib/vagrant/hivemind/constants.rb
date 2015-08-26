@@ -2,6 +2,7 @@ module Vagrant
   module Hivemind
     module Constants
       HIVE_FILE = "hive.yml"
+      ANSIBLE_HOSTS_FILE = "ansible.hosts"
 
       BOX_TYPES = {
         :server    => { name: "Server",     box_id: "napramirez/ubuntu-14.04.2-LTS-amd64-server",      is_gui: false },

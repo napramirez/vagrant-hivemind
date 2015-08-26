@@ -1,4 +1,5 @@
 require "yaml"
+require "erb"
 
 require_relative "constants"
 
@@ -102,6 +103,44 @@ module Vagrant
             end
           end
         end
+      end
+
+      class Ansible
+        def self.generate_hosts_file(hosts = {}, path = ".")
+          datetime_now = DateTime.now.strftime "%F %T %p"
+          b = binding
+
+          template_string = ""
+          File.open(File.expand_path("../../../../templates/ansible.hosts.erb", __FILE__), "r") do |f|
+            template_string = f.read
+          end
+
+          template = ERB.new template_string
+          template_result = template.result(b)
+
+          ansible_hosts_file = get_ansible_hosts_file_from_path path
+          File.open(ansible_hosts_file, "w+") do |f|
+            f.write(template_result)
+          end
+        end
+
+        def self.read_from(path = ".")
+          ansible_hosts_file = get_ansible_hosts_file_from_path path
+          ansible_hosts = ""
+          File.open() do |f|
+            ansible_hosts = f.read
+          end
+          ansible_hosts
+        end
+
+        private
+          def self.get_ansible_hosts_file_from_path(path)
+            if File.directory? path
+              File.join(path, Vagrant::Hivemind::Constants::ANSIBLE_HOSTS_FILE)
+            else
+              path
+            end
+          end
       end
 
     end
