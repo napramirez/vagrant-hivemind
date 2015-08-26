@@ -61,22 +61,12 @@ module Vagrant
 
           host = hosts[options[:hostname]]
 
-          template_string = ""
-          File.open(File.expand_path("../../../../../templates/Vagrantfile", __FILE__), "r") do |f|
-            template_string = f.read
-          end
-
-          template = ERB.new template_string
-          template_result = template.result(get_binding(host, BOX_TYPES, BOX_SIZES, Path.cache_path, Path.hivemind_home_path))
-
-          tf = Tempfile.new("Hivemind_Vagrantfile", Dir.pwd)
-          tf.write template_result
-          tf.close
+          hivemind_vagrantfile_name = Vagrant::Hivemind::Util::Vagrantfile.generate_hivemind_vagrantfile host
 
           @env.define_singleton_method :vagrantfile_name= do |vfn| @vagrantfile_name = vfn end
           @env.define_singleton_method :root_path= do |root_path| @root_path = root_path end
           @env.define_singleton_method :local_data_path= do |local_data_path| @local_data_path = local_data_path end
-          @env.vagrantfile_name = [File.basename(tf)]
+          @env.vagrantfile_name = [hivemind_vagrantfile_name]
           @env.root_path = Path.root_path
           @env.local_data_path = Path.local_data_path
           #@env.config_loader.set :root, tf.path
@@ -117,10 +107,6 @@ module Vagrant
         private
           def get_work_dir_from_options(options)
             options[:directory].empty? ? "." : options[:directory].first
-          end
-
-          def get_binding(host, box_types, box_sizes, cache_dir, hivemind_home_dir)
-            return binding
           end
 
       end

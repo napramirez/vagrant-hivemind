@@ -125,6 +125,30 @@ module Vagrant
         end
       end
 
+      class Vagrantfile
+        def self.generate_hivemind_vagrantfile(host)
+          box_types = Vagrant::Hivemind::Constants::BOX_TYPES
+          box_sizes = Vagrant::Hivemind::Constants::BOX_SIZES
+          cache_path = Path.cache_path
+          hivemind_home_path = Path.hivemind_home_path
+          b = binding
+
+          template_string = ""
+          File.open(File.expand_path("../../../../templates/Vagrantfile", __FILE__), "r") do |f|
+            template_string = f.read
+          end
+
+          template = ERB.new template_string
+          template_result = template.result(b)
+
+          tf = Tempfile.new("Hivemind_Vagrantfile", Dir.pwd)
+          tf.write template_result
+          tf.close
+
+          File.basename tf
+        end
+      end
+
       class Ansible
         def self.generate_hosts_file(hosts = {}, path = ".")
           datetime_now = DateTime.now.strftime "%F %T %p"
