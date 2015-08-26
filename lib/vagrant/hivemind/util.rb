@@ -121,7 +121,9 @@ module Vagrant
         end
 
         def self.local_data_path
-          root_path.join ".vagrant"
+          local_data_path = root_path.join ".vagrant"
+          Dir.mkdir local_data_path unless local_data_path.directory?
+          local_data_path
         end
       end
 
