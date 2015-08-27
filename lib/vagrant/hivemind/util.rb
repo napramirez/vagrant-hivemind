@@ -141,7 +141,7 @@ module Vagrant
           b = binding
 
           template_string = ""
-          File.open(File.expand_path("../../../../templates/Vagrantfile", __FILE__), "r") do |f|
+          File.open(File.expand_path("../../../../templates/Vagrantfile.erb", __FILE__), "r") do |f|
             template_string = f.read
           end
 
