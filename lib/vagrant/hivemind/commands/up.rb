@@ -67,7 +67,6 @@ module Vagrant
           @env.vagrantfile_name = [hivemind_vagrantfile_name]
           @env.root_path = root_path
           @env.local_data_path = Path.local_data_path root_path
-          #@env.config_loader.set :root, tf.path
 
           machines = []
           @env.batch do |batch|
