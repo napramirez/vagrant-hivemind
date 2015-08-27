@@ -138,6 +138,7 @@ module Vagrant
           box_sizes = Vagrant::Hivemind::Constants::BOX_SIZES
           cache_path = Path.cache_path
           hivemind_home_path = Path.hivemind_home_path
+          local_data_path = Path.local_data_path path
           b = binding
 
           template_string = ""

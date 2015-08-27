@@ -68,6 +68,8 @@ module Vagrant
           @env.root_path = root_path
           @env.local_data_path = Path.local_data_path root_path
 
+          Ansible.generate_hosts_file hosts, Path.local_data_path(root_path)
+
           machines = []
           @env.batch do |batch|
             with_target_vms(options[:hostname]) do |machine|
