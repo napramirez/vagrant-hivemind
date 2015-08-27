@@ -8,18 +8,18 @@ module Vagrant
     module Util
 
       class HiveFile
-        def self.exist?(path = ".")
+        def self.exist?(path = Pathname.new(Dir.pwd))
           File.exist? get_hive_file_from_path path
         end
 
-        def self.read_from(path = ".")
+        def self.read_from(path = Pathname.new(Dir.pwd))
           hive_file = get_hive_file_from_path path
           hosts_from_hive_file = {}
           hosts_from_hive_file = YAML.load_file(hive_file) if File.exist? hive_file
           hosts_from_hive_file
         end
 
-        def self.write_to(hosts = {}, path = ".")
+        def self.write_to(hosts = {}, path = Pathname.new(Dir.pwd))
           hive_file = get_hive_file_from_path path
           File.open(hive_file, "w+") do |f|
             f.write(hosts.to_yaml)
@@ -106,6 +106,11 @@ module Vagrant
       end
 
       class Path
+        def self.get_root_path_from_options(options = {})
+          path = options[:directory] ||= [Dir.pwd]
+          root_path path.first
+        end
+
         def self.cache_path
           cache_path = Pathname.new(Dir.tmpdir).join "hivemind"
           Dir.mkdir cache_path unless cache_path.directory?
@@ -116,19 +121,19 @@ module Vagrant
           Pathname.new File.expand_path("../../../../", __FILE__)
         end
 
-        def self.root_path(work_dir = Dir.pwd)
-          Pathname.new File.expand_path work_dir, Dir.pwd
+        def self.root_path(path = Pathname.new(Dir.pwd))
+          Pathname.new File.expand_path path, Pathname.new(Dir.pwd)
         end
 
-        def self.local_data_path(work_dir = Dir.pwd)
-          local_data_path = root_path(work_dir).join ".vagrant"
+        def self.local_data_path(path = Pathname.new(Dir.pwd))
+          local_data_path = root_path(path).join ".vagrant"
           Dir.mkdir local_data_path unless local_data_path.directory?
           local_data_path
         end
       end
 
       class Vagrantfile
-        def self.generate_hivemind_vagrantfile(host, work_dir = Dir.pwd)
+        def self.generate_hivemind_vagrantfile(host, path = Pathname.new(Dir.pwd))
           box_types = Vagrant::Hivemind::Constants::BOX_TYPES
           box_sizes = Vagrant::Hivemind::Constants::BOX_SIZES
           cache_path = Path.cache_path
@@ -143,7 +148,7 @@ module Vagrant
           template = ERB.new template_string
           template_result = template.result(b)
 
-          tf = Tempfile.new("Hivemind_Vagrantfile", work_dir)
+          tf = Tempfile.new("Hivemind_Vagrantfile", path)
           tf.write template_result
           tf.close
 

@@ -16,10 +16,7 @@ module Vagrant
         end
 
         def execute
-          options = {
-            :force     => false,
-            :directory => []
-          }
+          options = {}
 
           OptionParser.new do |o|
             o.banner = "Usage: vagrant hivemind init [options]"
@@ -32,15 +29,16 @@ module Vagrant
             end
 
             o.on("-d", "--directory DIRECTORY", "Specify the directory where '#{HIVE_FILE}' will be created (default: current directory)") do |d|
+              options[:directory] = []
               options[:directory] << d
             end
           end.parse!
 
-          work_dir = get_work_dir_from_options options
+          root_path = Path.get_root_path_from_options options
 
-          if HiveFile.exist? work_dir
+          if HiveFile.exist? root_path
             if options[:force]
-              write_new_hive_file work_dir
+              write_new_hive_file root_path
               @env.ui.info "The Hive file has been overwritten."
               return 0
             else
@@ -49,22 +47,18 @@ module Vagrant
             end
           end
 
-          write_new_hive_file work_dir
+          write_new_hive_file root_path
           @env.ui.info "The Hive file has been created in the working directory."
 
           0
         end
 
         private
-          def get_work_dir_from_options(options)
-            options[:directory].empty? ? "." : options[:directory].first
-          end
-
-          def write_new_hive_file(work_dir)
+          def write_new_hive_file(path)
             hosts = {
               "control" => Vagrant::Hivemind::Host.control
             }
-            HiveFile.write_to hosts, work_dir
+            HiveFile.write_to hosts, path
           end
 
       end

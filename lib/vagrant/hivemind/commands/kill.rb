@@ -16,10 +16,7 @@ module Vagrant
         end
 
         def execute
-          options = {
-            :hostname  => nil,
-            :directory => []
-          }
+          options = {}
 
           opts = OptionParser.new do |o|
             o.banner = "Usage: vagrant hivemind kill [options]"
@@ -32,6 +29,7 @@ module Vagrant
             end
 
             o.on("-d", "--directory DIRECTORY", "Specify the directory where '#{HIVE_FILE}' is located (default: current directory)") do |d|
+              options[:directory] = []
               options[:directory] << d
             end
           end
@@ -44,14 +42,14 @@ module Vagrant
             return 0
           end
 
-          work_dir = get_work_dir_from_options options
+          root_path = Path.get_root_path_from_options options
 
-          unless HiveFile.exist? work_dir
+          unless HiveFile.exist? root_path
             @env.ui.error "There is no Hive file in the working directory."
             return 1
           end
 
-          hosts = HiveFile.read_from work_dir
+          hosts = HiveFile.read_from root_path
 
           unless hosts.values.map(&:hostname).include? options[:hostname]
             @env.ui.error "The specified hostname does not exist!"
@@ -59,16 +57,11 @@ module Vagrant
           end
 
           hosts.delete options[:hostname]
-          HiveFile.write_to hosts, work_dir
+          HiveFile.write_to hosts, root_path
           @env.ui.info "Killed the Drone with hostname '#{options[:hostname]}'"
 
           0
         end
-
-        private
-          def get_work_dir_from_options(options)
-            options[:directory].empty? ? "." : options[:directory].first
-          end
 
       end
     end

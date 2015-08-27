@@ -17,10 +17,7 @@ module Vagrant
         end
 
         def execute
-          options = {
-            :hostname  => nil,
-            :directory => []
-          }
+          options = {}
 
           opts = OptionParser.new do |o|
             o.banner = "Usage: vagrant hivemind up [options]"
@@ -33,6 +30,7 @@ module Vagrant
             end
 
             o.on("-d", "--directory DIRECTORY", "Specify the directory where '#{HIVE_FILE}' is located (default: current directory)") do |d|
+              options[:directory] = []
               options[:directory] << d
             end
           end
@@ -45,14 +43,14 @@ module Vagrant
             return 0
           end
 
-          work_dir = Path.root_path(get_work_dir_from_options(options))
+          root_path = Path.get_root_path_from_options options
 
-          unless HiveFile.exist? work_dir
+          unless HiveFile.exist? root_path
             @env.ui.error "There is no Hive file in the working directory."
             return 1
           end
 
-          hosts = HiveFile.read_from work_dir
+          hosts = HiveFile.read_from root_path
 
           unless hosts.values.map(&:hostname).include? options[:hostname]
             @env.ui.error "The specified hostname does not exist!"
@@ -61,14 +59,14 @@ module Vagrant
 
           host = hosts[options[:hostname]]
 
-          hivemind_vagrantfile_name = Vagrant::Hivemind::Util::Vagrantfile.generate_hivemind_vagrantfile host, work_dir
+          hivemind_vagrantfile_name = Vagrant::Hivemind::Util::Vagrantfile.generate_hivemind_vagrantfile host, root_path
 
           @env.define_singleton_method :vagrantfile_name= do |vfn| @vagrantfile_name = vfn end
           @env.define_singleton_method :root_path= do |root_path| @root_path = root_path end
           @env.define_singleton_method :local_data_path= do |local_data_path| @local_data_path = local_data_path end
           @env.vagrantfile_name = [hivemind_vagrantfile_name]
-          @env.root_path = work_dir
-          @env.local_data_path = Path.local_data_path work_dir
+          @env.root_path = root_path
+          @env.local_data_path = Path.local_data_path root_path
           #@env.config_loader.set :root, tf.path
 
           machines = []
@@ -103,11 +101,6 @@ module Vagrant
 
           0
         end
-
-        private
-          def get_work_dir_from_options(options)
-            options[:directory].empty? ? "." : options[:directory].first
-          end
 
       end
     end

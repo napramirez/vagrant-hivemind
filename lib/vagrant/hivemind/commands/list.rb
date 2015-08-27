@@ -16,9 +16,7 @@ module Vagrant
         end
 
         def execute
-          options = {
-            :directory => []
-          }
+          options = {}
 
           opts = OptionParser.new do |o|
             o.banner = "Usage: vagrant hivemind list [options]"
@@ -43,6 +41,7 @@ module Vagrant
             end
 
             o.on("-d", "--directory DIRECTORY", "Specify the directory where '#{HIVE_FILE}' is located (default: current directory)") do |d|
+              options[:directory] = []
               options[:directory] << d
             end
           end
@@ -50,14 +49,14 @@ module Vagrant
           argv = parse_options(opts)
           return if !argv
 
-          work_dir = get_work_dir_from_options options
+          root_path = Path.get_root_path_from_options options
 
-          unless HiveFile.exist? work_dir
+          unless HiveFile.exist? root_path
             @env.ui.error "There is no Hive file in the working directory."
             return 1
           end
 
-          hosts = HiveFile.read_from work_dir
+          hosts = HiveFile.read_from root_path
 
           sorted_hosts = sort_hosts hosts, options
 
@@ -80,10 +79,6 @@ module Vagrant
         end
 
         private
-          def get_work_dir_from_options(options)
-            options[:directory].empty? ? "." : options[:directory].first
-          end
-
           def sort_hosts(hosts, options = {})
             sorted_hosts = hosts
             options.keys.each do |key|
