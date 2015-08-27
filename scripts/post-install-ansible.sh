@@ -1,4 +1,4 @@
 #!/bin/bash
 #
 
-cat /vagrant/cache/ansible.hosts > /etc/ansible/hosts
+sudo mv /tmp/ansible.hosts /etc/ansible/hosts

@@ -26,8 +26,9 @@ Vagrant.configure(2) do |config|
       # 1. Install Ansible from the PPA
       host_config.vm.provision "shell", path: "<%= hivemind_home_path %>/scripts/install-ansible.sh"
 
-      # 2. Copy the Ansible hosts file
-      host_config.vm.provision "file", source: "<%= local_data_path %>/ansible.hosts", destination: "/etc/ansible/hosts"
+      # 2. Copy the Ansible hosts file: First to /tmp, next from /tmp to /etc/ansible/hosts using sudo
+      host_config.vm.provision "file", source: "<%= local_data_path %>/ansible.hosts", destination: "/tmp/ansible.hosts"
+      host_config.vm.provision "shell", path: "<%= hivemind_home_path %>/scripts/post-install-ansible.sh"
     end
 
     # Setup Drone SSH
