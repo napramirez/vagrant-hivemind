@@ -195,6 +195,35 @@ module Vagrant
           end
       end
 
+      class HostsFile
+        def self.generate_hosts_file(hosts = {}, path = Pathname.new(Dir.pwd))
+          datetime_now = DateTime.now.strftime "%F %T %p"
+          b = binding
+
+          template_string = ""
+          File.open(File.expand_path("../../../../templates/system.hosts.erb", __FILE__), "r") do |f|
+            template_string = f.read
+          end
+
+          template = ERB.new template_string
+          template_result = template.result(b)
+
+          system_hosts_file = get_system_hosts_file_from_path path
+          File.open(system_hosts_file, "w+") do |f|
+            f.write(template_result)
+          end
+        end
+
+        private
+          def self.get_system_hosts_file_from_path(path)
+            if File.directory? path
+              File.join(path, Vagrant::Hivemind::Constants::SYSTEM_HOSTS_FILE)
+            else
+              path
+            end
+          end
+      end
+
     end
   end
 end

@@ -1,4 +1,5 @@
 #!/bin/bash
 #
 
-cat /vagrant/cache/system.hosts >> /etc/hosts
+sudo sed '/^# Enter hand-edited entries above this line.$/,$d' -i /etc/hosts
+cat /tmp/system.hosts | sudo tee -a /etc/hosts
