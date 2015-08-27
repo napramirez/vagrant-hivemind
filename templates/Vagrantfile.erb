@@ -27,8 +27,8 @@ Vagrant.configure(2) do |config|
       host_config.vm.provision "shell", path: "<%= hivemind_home_path %>/scripts/install-ansible.sh"
 
       # 2. Copy the Ansible hosts file: First to /tmp, next from /tmp to /etc/ansible/hosts using sudo
-      host_config.vm.provision "file", source: "<%= local_data_path %>/ansible.hosts", destination: "/tmp/ansible.hosts"
-      host_config.vm.provision "shell", path: "<%= hivemind_home_path %>/scripts/post-install-ansible.sh"
+      host_config.vm.provision "file", source: "<%= local_data_path %>/ansible.hosts", destination: "/tmp/ansible.hosts", run: "always"
+      host_config.vm.provision "shell", path: "<%= hivemind_home_path %>/scripts/post-install-ansible.sh", run: "always"
     end
 
     # Setup Drone SSH
@@ -39,7 +39,7 @@ Vagrant.configure(2) do |config|
     host_config.vm.provision "shell", path: "<%= hivemind_home_path %>/scripts/setup-drone-ssh.sh"
 
     # 2. Copy the system hosts to /tmp, then append contents from /tmp to /etc/hosts using sudo
-    host_config.vm.provision "file", source: "<%= local_data_path %>/system.hosts", destination: "/tmp/system.hosts"
-    host_config.vm.provision "shell", path: "<%= hivemind_home_path %>/scripts/update-system-hosts.sh"
+    host_config.vm.provision "file", source: "<%= local_data_path %>/system.hosts", destination: "/tmp/system.hosts", run: "always"
+    host_config.vm.provision "shell", path: "<%= hivemind_home_path %>/scripts/update-system-hosts.sh", run: "always"
   end
 end
