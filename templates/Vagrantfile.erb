@@ -9,7 +9,7 @@ Vagrant.configure(2) do |config|
     end
 
     host_config.vm.synced_folder "<%= cache_path %>/cache/apt", "/var/cache/apt/archives", create: true
-    host_config.vm.provision "shell" do |s|
+    host_config.vm.provision "shell", run: "once" do |s|
       s.path = "<%= hivemind_home_path %>/scripts/setup-hostname.sh"
       s.args = ["<%= host.hostname %>"]
     end
@@ -17,14 +17,14 @@ Vagrant.configure(2) do |config|
     if "<%= host.is_control %>" == "true"
       # Setup Control Machine SSH
       # 1. Copy the private key
-      host_config.vm.provision "file", source: "<%= hivemind_home_path %>/keys/id_rsa", destination: "/home/vagrant/.ssh/id_rsa"
+      host_config.vm.provision "file", source: "<%= hivemind_home_path %>/keys/id_rsa", destination: "/home/vagrant/.ssh/id_rsa", run: "once"
 
       # 2. Set the right permissions of the SSH directory and private key
-      host_config.vm.provision "shell", path: "<%= hivemind_home_path %>/scripts/setup-control-ssh.sh"
+      host_config.vm.provision "shell", path: "<%= hivemind_home_path %>/scripts/setup-control-ssh.sh", run: "once"
 
       # Setup Ansible in the Control Machine
       # 1. Install Ansible from the PPA
-      host_config.vm.provision "shell", path: "<%= hivemind_home_path %>/scripts/install-ansible.sh"
+      host_config.vm.provision "shell", path: "<%= hivemind_home_path %>/scripts/install-ansible.sh", run: "once"
 
       # 2. Copy the Ansible hosts file: First to /tmp, next from /tmp to /etc/ansible/hosts using sudo
       host_config.vm.provision "file", source: "<%= local_data_path %>/ansible.hosts", destination: "/tmp/ansible.hosts", run: "always"
@@ -33,10 +33,10 @@ Vagrant.configure(2) do |config|
 
     # Setup Drone SSH
     # 1. Copy the Control Machine public key
-    host_config.vm.provision "file", source: "<%= hivemind_home_path %>/keys/id_rsa.pub", destination: "/home/vagrant/.ssh/control_id_rsa.pub"
+    host_config.vm.provision "file", source: "<%= hivemind_home_path %>/keys/id_rsa.pub", destination: "/home/vagrant/.ssh/control_id_rsa.pub", run: "once"
 
     # Add the Control Machine public key to the authorized_keys file
-    host_config.vm.provision "shell", path: "<%= hivemind_home_path %>/scripts/setup-drone-ssh.sh"
+    host_config.vm.provision "shell", path: "<%= hivemind_home_path %>/scripts/setup-drone-ssh.sh", run: "once"
 
     # 2. Copy the system hosts to /tmp, then append contents from /tmp to /etc/hosts using sudo
     host_config.vm.provision "file", source: "<%= local_data_path %>/system.hosts", destination: "/tmp/system.hosts", run: "always"
