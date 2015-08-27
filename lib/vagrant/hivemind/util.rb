@@ -157,7 +157,7 @@ module Vagrant
       end
 
       class Ansible
-        def self.generate_hosts_file(hosts = {}, path = ".")
+        def self.generate_hosts_file(hosts = {}, path = Pathname.new(Dir.pwd))
           datetime_now = DateTime.now.strftime "%F %T %p"
           b = binding
 
@@ -175,7 +175,7 @@ module Vagrant
           end
         end
 
-        def self.read_from(path = ".")
+        def self.read_from(path = Pathname.new(Dir.pwd))
           ansible_hosts_file = get_ansible_hosts_file_from_path path
           ansible_hosts = ""
           File.open() do |f|
