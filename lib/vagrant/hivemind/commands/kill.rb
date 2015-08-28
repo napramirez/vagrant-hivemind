@@ -56,6 +56,21 @@ module Vagrant
             return 1
           end
 
+          host = hosts[options[:hostname]]
+
+          hivemind_vagrantfile_name = Vagrant::Hivemind::Util::Vagrantfile.generate_hivemind_vagrantfile host, root_path
+
+          @env.define_singleton_method :vagrantfile_name= do |vfn| @vagrantfile_name = vfn end
+          @env.define_singleton_method :root_path= do |root_path| @root_path = root_path end
+          @env.define_singleton_method :local_data_path= do |local_data_path| @local_data_path = local_data_path end
+          @env.vagrantfile_name = [hivemind_vagrantfile_name]
+          @env.root_path = root_path
+          @env.local_data_path = Path.local_data_path root_path
+
+          with_target_vms(options[:hostname]) do |vm|
+            action_env = vm.action(:destroy, force_confirm_destroy: true)
+          end
+
           hosts.delete options[:hostname]
           HiveFile.write_to hosts, root_path
           @env.ui.info "Killed the Drone with hostname '#{options[:hostname]}'"
