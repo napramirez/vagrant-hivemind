@@ -50,6 +50,11 @@ module Vagrant
             Up
           end
 
+          @subcommands.register(:halt) do
+            require_relative "halt"
+            Halt
+          end
+
         end
 
         def execute
