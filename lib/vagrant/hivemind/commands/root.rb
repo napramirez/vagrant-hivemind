@@ -5,7 +5,7 @@ module Vagrant
     module Command
       class Root < Vagrant.plugin("2", :command)
         def self.synopsis
-          "Hivemind operations: init list desc spawn kill morph"
+          "Hivemind operations: init list desc spawn kill morph up halt"
         end
 
         def initialize(argv, env)
