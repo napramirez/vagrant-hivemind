@@ -5,15 +5,15 @@ A Vagrant plugin for users who want to use Vagrant, but don't want to be bothere
 
 
 ## Features
-### Create VM's with the least amount of knowledge
+#### Create VM's with the least amount of knowledge
 
 Hivemind provides the simplest of options for defining a VM: hostname, RAM allocation, and VM type.
 
-### Use the leanest base boxes
+#### Use the leanest base boxes
 
 Make use of properly crafted base boxes with disk space optimization in mind.  There's a box for your every need: server boxes or desktop boxes.
 
-### Networking is simple
+#### Networking is simple
 
 The VM's are automatically connected in a private network and hostnames are resolvable using a simple mapping.
 
