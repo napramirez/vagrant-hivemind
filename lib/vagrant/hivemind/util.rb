@@ -133,7 +133,7 @@ module Vagrant
       end
 
       class Vagrantfile
-        def self.generate_hivemind_vagrantfile(host, path = Pathname.new(Dir.pwd))
+        def self.generate_hivemind_vagrantfile(env, host, path = Pathname.new(Dir.pwd))
           box_types = Vagrant::Hivemind::Constants::BOX_TYPES
           box_sizes = Vagrant::Hivemind::Constants::BOX_SIZES
           cache_path = Path.cache_path
@@ -153,7 +153,14 @@ module Vagrant
           tf.write template_result
           tf.close
 
-          File.basename tf
+          env.define_singleton_method :vagrantfile_name= do |vfn| @vagrantfile_name = vfn end
+          env.define_singleton_method :root_path= do |root_path| @root_path = root_path end
+          env.define_singleton_method :local_data_path= do |local_data_path| @local_data_path = local_data_path end
+          env.vagrantfile_name = [File.basename(tf)]
+          env.root_path = path
+          env.local_data_path = local_data_path
+
+          nil
         end
       end
 
