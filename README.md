@@ -1,4 +1,7 @@
 # Hivemind Plugin for Vagrant
+
+[![Build Status](https://travis-ci.org/napramirez/vagrant-hivemind.svg?branch=master)](https://travis-ci.org/napramirez/vagrant-hivemind)
+
 #### Use Vagrant without ever configuring a Vagrantfile!
 
 A Vagrant plugin for users who want to use Vagrant, but don't want to be bothered with Vagrant configuration. This is ideal for developers who just want something up and running in seconds.
