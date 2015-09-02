@@ -1,7 +1,7 @@
 # Hivemind Plugin for Vagrant
 
-[![Build Status](https://travis-ci.org/napramirez/vagrant-hivemind.svg?branch=master)](https://travis-ci.org/napramirez/vagrant-hivemind)
-[![Coverage Status](https://coveralls.io/repos/napramirez/vagrant-hivemind/badge.svg?branch=master&service=github)](https://coveralls.io/github/napramirez/vagrant-hivemind?branch=master)
+[![Build Status](https://travis-ci.org/napramirez/vagrant-hivemind.png?branch=master)](https://travis-ci.org/napramirez/vagrant-hivemind)
+[![Coverage Status](https://coveralls.io/repos/napramirez/vagrant-hivemind/badge.png?branch=master&service=github)](https://coveralls.io/github/napramirez/vagrant-hivemind?branch=master)
 
 #### Use Vagrant without ever configuring a Vagrantfile!
 
