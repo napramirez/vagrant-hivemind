@@ -1,4 +1,5 @@
 Vagrant.configure(2) do |config|
+  <% hosts.each_value do |host| %>
   config.vm.define "<%= host.hostname %>" do |host_config|
     host_config.vm.box = "<%= box_types[host.box_type.to_sym][:box_id] %>"
     host_config.vm.network "private_network", ip: "<%= host.ip_address %>", virtualbox__intnet: true
@@ -45,4 +46,5 @@ Vagrant.configure(2) do |config|
     host_config.vm.provision "file", source: "<%= local_data_path %>/system.hosts", destination: "/tmp/system.hosts", run: "always"
     host_config.vm.provision "shell", path: "<%= hivemind_home_path %>/scripts/update-system-hosts.sh", run: "always"
   end
+  <% end %>
 end

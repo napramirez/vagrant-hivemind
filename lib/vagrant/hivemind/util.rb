@@ -133,7 +133,7 @@ module Vagrant
       end
 
       class Vagrantfile
-        def self.generate_hivemind_vagrantfile(env, host, path = Pathname.new(Dir.pwd))
+        def self.generate_hivemind_vagrantfile(env, hosts, path = Pathname.new(Dir.pwd))
           box_types = Vagrant::Hivemind::Constants::BOX_TYPES
           box_sizes = Vagrant::Hivemind::Constants::BOX_SIZES
           cache_path = Path.cache_path

@@ -56,9 +56,7 @@ module Vagrant
             return 1
           end
 
-          host = hosts[options[:hostname]]
-
-          Vagrant::Hivemind::Util::Vagrantfile.generate_hivemind_vagrantfile @env, host, root_path
+          Vagrant::Hivemind::Util::Vagrantfile.generate_hivemind_vagrantfile @env, hosts, root_path
 
           with_target_vms(options[:hostname]) do |vm|
             action_env = vm.action(:destroy, force_confirm_destroy: true)

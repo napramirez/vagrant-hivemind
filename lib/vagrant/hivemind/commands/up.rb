@@ -57,9 +57,7 @@ module Vagrant
             return 1
           end
 
-          host = hosts[options[:hostname]]
-
-          Vagrant::Hivemind::Util::Vagrantfile.generate_hivemind_vagrantfile @env, host, root_path
+          Vagrant::Hivemind::Util::Vagrantfile.generate_hivemind_vagrantfile @env, hosts, root_path
           Ansible.generate_hosts_file hosts, Path.local_data_path(root_path)
           HostsFile.generate_hosts_file hosts, Path.local_data_path(root_path)
 
