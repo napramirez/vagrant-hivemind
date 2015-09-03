@@ -2,7 +2,7 @@ Vagrant.configure(2) do |config|
   <% hosts.each_value do |host| %>
   config.vm.define "<%= host.hostname %>" do |host_config|
     host_config.vm.box = "<%= box_types[host.box_type.to_sym][:box_id] %>"
-    host_config.vm.network "private_network", ip: "<%= host.ip_address %>", virtualbox__intnet: true
+    host_config.vm.network "private_network", ip: "<%= host.ip_address %>", virtualbox__intnet: "<%= path.basename.to_s.gsub(/[^-a-z0-9_]/i, "") %>"
 
     <% host.forwarded_ports.each do |forwarded_port| %>
     host_config.vm.network "forwarded_port", guest: <%= forwarded_port["guest_port"] %>, host: <%= forwarded_port["host_port"] %><% end %>
