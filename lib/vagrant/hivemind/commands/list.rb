@@ -60,15 +60,21 @@ module Vagrant
 
           sorted_hosts = sort_hosts hosts, options
 
+          Vagrant::Hivemind::Util::Vagrantfile.generate_hivemind_vagrantfile @env, sorted_hosts, root_path
+
           @env.ui.info "Hostname             IP Address     C Size         Box Type   G Status"
           sorted_hosts.values.each do |host|
+            status = ""
+            with_target_vms(host.hostname) do |machine|
+              status = machine.state.short_description
+            end
             hostname       = host.hostname
             ip_address     = host.ip_address
             is_control_y_n = host.is_control ? 'Y' : 'N'
             box_size       = BOX_SIZES[host.box_size.to_sym][:name]
             box_type       = BOX_TYPES[host.box_type.to_sym][:name]
             is_gui_y_n     = BOX_TYPES[host.box_type.to_sym][:is_gui] ? 'Y' : 'N'
-            @env.ui.info "#{'%-20.20s' % hostname} #{'%-14.14s' % ip_address} #{is_control_y_n} #{'%-12.12s' % box_size} #{'%-10.10s' % box_type} #{is_gui_y_n}"
+            @env.ui.info "#{'%-20.20s' % hostname} #{'%-14.14s' % ip_address} #{is_control_y_n} #{'%-12.12s' % box_size} #{'%-10.10s' % box_type} #{is_gui_y_n} #{status}"
           end
           @env.ui.info ""
 
