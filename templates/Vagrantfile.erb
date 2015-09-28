@@ -12,6 +12,7 @@ Vagrant.configure(2) do |config|
       vb.gui = "<%= box_types[host.box_type.to_sym][:is_gui] %>" == "true"
     end
 
+    host_config.vm.synced_folder "<%= cache_path %>/cache/hivemind", "/var/cache/hivemind", create: true
     host_config.vm.synced_folder "<%= cache_path %>/cache/apt", "/var/cache/apt/archives", create: true
     host_config.vm.provision "shell", run: "once" do |s|
       s.path = "<%= hivemind_home_path %>/scripts/setup-hostname.sh"
