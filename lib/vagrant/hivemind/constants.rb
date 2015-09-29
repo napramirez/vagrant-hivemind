@@ -6,7 +6,7 @@ module Vagrant
       SYSTEM_HOSTS_FILE = "system.hosts"
 
       BOX_TYPES = {
-        :server    => { name: "Server",     box_id: "napramirez/ubuntu-14.04.2-LTS-amd64-server",      is_gui: false },
+        :server    => { name: "Server",     box_id: "napramirez/ubuntu-14.04-server-amd64",            is_gui: false },
         :kde       => { name: "KDE",        box_id: "napramirez/kubuntu-14.04.2-LTS-amd64-lite",       is_gui: true },
         :unity     => { name: "Unity",      box_id: "napramirez/ubuntu-14.04.2-LTS-amd64-desktoplite", is_gui: true },
         :unityi386 => { name: "Unity i386", box_id: "napramirez/ubuntu-14.04.2-LTS-i386-desktoplite",  is_gui: true }
