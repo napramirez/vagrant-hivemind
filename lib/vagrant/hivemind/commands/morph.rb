@@ -44,6 +44,10 @@ module Vagrant
               options[:forwarded_port] = p
             end
 
+            o.on("-D", "--detach-data", "Detach the Drone's data directory as a synced folder to the host") do |d|
+              options[:detach] = d
+            end
+
             o.on("-d", "--directory DIRECTORY", "Specify the directory where '#{HIVE_FILE}' is located (default: current directory)") do |d|
               options[:directory] = []
               options[:directory] << d
@@ -116,6 +120,10 @@ module Vagrant
               }
               host.forwarded_ports << port_pair
             end
+          end
+
+          if options[:detach]
+            host.is_data_detached = true
           end
 
           hosts.delete options[:hostname]

@@ -40,6 +40,10 @@ module Vagrant
               options[:type] = t
             end
 
+            o.on("-D", "--detach-data", "Detach the Drone's data directory as a synced folder to the host") do |d|
+              options[:detach] = d
+            end
+
             o.on("-d", "--directory DIRECTORY", "Specify the directory where '#{HIVE_FILE}' is located (default: current directory)") do |d|
               options[:directory] = []
               options[:directory] << d
@@ -80,7 +84,8 @@ module Vagrant
               {
                 is_control: options[:control],
                 box_size:   options[:size],
-                box_type:   options[:type]
+                box_type:   options[:type],
+                is_data_detached: options[:detach]
               })
           }
           HiveFile.write_to hosts.merge(drone), root_path

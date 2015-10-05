@@ -3,7 +3,7 @@ require_relative "constants"
 module Vagrant
   module Hivemind
     class Host
-      attr_accessor :hostname, :ip_address, :is_control, :box_size, :box_type, :forwarded_ports
+      attr_accessor :hostname, :ip_address, :is_control, :box_size, :box_type, :forwarded_ports, :is_data_detached
       @control = nil
 
       def initialize(hostname, ip_address, options = {})
@@ -13,6 +13,7 @@ module Vagrant
         @box_size   = options[:box_size]   || :small.to_s
         @box_type   = options[:box_type]   || :server.to_s
         @forwarded_ports = []
+        @is_data_detached = options[:is_data_detached] || false
       end
 
       def self.control

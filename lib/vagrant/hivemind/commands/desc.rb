@@ -64,6 +64,7 @@ module Vagrant
           @env.ui.info "Box Size        : #{BOX_SIZES[host.box_size.to_sym][:name]} (#{BOX_SIZES[host.box_size.to_sym][:memory_in_mb]}MB)"
           @env.ui.info "Box Type        : #{BOX_TYPES[host.box_type.to_sym][:name]} (#{BOX_TYPES[host.box_type.to_sym][:box_id]})"
           @env.ui.info "GUI Machine     : #{BOX_TYPES[host.box_type.to_sym][:is_gui] ? 'Yes' : 'No'}"
+          @env.ui.info "Detached Data   : #{host.is_data_detached ? 'Yes' : 'No'}"
           @env.ui.info ""
 
           if host.forwarded_ports and !host.forwarded_ports.empty?
