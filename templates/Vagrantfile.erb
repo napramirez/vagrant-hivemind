@@ -20,20 +20,20 @@ Vagrant.configure(2) do |config|
     end
 
     <% if host.is_control %>
-      # Setup Control Machine SSH
-      # 1. Copy the private key
-      host_config.vm.provision "file", source: "<%= hivemind_home_path %>/keys/id_rsa", destination: "/home/vagrant/.ssh/id_rsa", run: "once"
+    # Setup Control Machine SSH
+    # 1. Copy the private key
+    host_config.vm.provision "file", source: "<%= hivemind_home_path %>/keys/id_rsa", destination: "/home/vagrant/.ssh/id_rsa", run: "once"
 
-      # 2. Set the right permissions of the SSH directory and private key
-      host_config.vm.provision "shell", path: "<%= hivemind_home_path %>/scripts/setup-control-ssh.sh", run: "once"
+    # 2. Set the right permissions of the SSH directory and private key
+    host_config.vm.provision "shell", path: "<%= hivemind_home_path %>/scripts/setup-control-ssh.sh", run: "once"
 
-      # Setup Ansible in the Control Machine
-      # 1. Install Ansible from the PPA
-      host_config.vm.provision "shell", path: "<%= hivemind_home_path %>/scripts/install-ansible.sh", run: "once"
+    # Setup Ansible in the Control Machine
+    # 1. Install Ansible from the PPA
+    host_config.vm.provision "shell", path: "<%= hivemind_home_path %>/scripts/install-ansible.sh", run: "once"
 
-      # 2. Copy the Ansible hosts file: First to /tmp, next from /tmp to /etc/ansible/hosts using sudo
-      host_config.vm.provision "file", source: "<%= local_data_path %>/ansible.hosts", destination: "/tmp/ansible.hosts", run: "always"
-      host_config.vm.provision "shell", path: "<%= hivemind_home_path %>/scripts/post-install-ansible.sh", run: "always"
+    # 2. Copy the Ansible hosts file: First to /tmp, next from /tmp to /etc/ansible/hosts using sudo
+    host_config.vm.provision "file", source: "<%= local_data_path %>/ansible.hosts", destination: "/tmp/ansible.hosts", run: "always"
+    host_config.vm.provision "shell", path: "<%= hivemind_home_path %>/scripts/post-install-ansible.sh", run: "always"
     <% end %>
 
     # Setup Drone SSH
