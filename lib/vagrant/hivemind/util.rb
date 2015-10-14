@@ -36,6 +36,14 @@ module Vagrant
           end
       end
 
+      class Args
+        def self.from_csv(csv)
+          return nil unless csv
+          tokens = csv.delete(" ").split(",").select do |token| !token.empty? end
+          tokens.empty? ? nil : tokens
+        end
+      end
+
       class Network
         def self.is_valid_hostname?(hostname)
           return false unless hostname and hostname.size > 0 and hostname.size <= Vagrant::Hivemind::Constants::SIMPLE_HOSTNAME_MAX_LENGTH
