@@ -24,7 +24,7 @@ module Vagrant
             o.separator "Options:"
             o.separator ""
 
-            o.on("-n", "--hostname HOSTNAME", "The hostname of the Drone (REQUIRED)") do |n|
+            o.on("-n", "--hostname HOSTNAME", "A comma-separated list of Drone hostnames (REQUIRED)") do |n|
               options[:hostname] = Args.from_csv n
             end
 
