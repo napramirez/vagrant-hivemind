@@ -25,7 +25,7 @@ module Vagrant
             o.separator ""
 
             o.on("-n", "--hostname HOSTNAME", "The hostname of the Drone (REQUIRED)") do |n|
-              options[:hostname] = n
+              options[:hostname] = Args.from_csv n
             end
 
             o.on("-c", "--control", "Assign the Drone to be a Control Machine") do |c|
@@ -67,29 +67,40 @@ module Vagrant
 
           hosts = HiveFile.read_from root_path
 
-          if hosts.values.map(&:hostname).include? options[:hostname]
-            @env.ui.error "The specified hostname already exists!"
+          hostnames = []
+          options[:hostname].each do |hostname|
+            if hosts.values.map(&:hostname).include? hostname
+              @env.ui.warn "The hostname '#{hostname}' already exists in the Hive!"
+            else
+              if Network.is_valid_hostname? hostname
+                hostnames << hostname
+              else
+                @env.ui.warn "Invalid hostname format!"
+              end
+            end
+          end
+
+          if hostnames.empty?
+            @env.ui.warn "No Drones to spawn!"
             return 1
           end
 
-          unless Network.is_valid_hostname? options[:hostname]
-            @env.ui.error "Invalid hostname format!"
-            return 1
+          hostnames.each do |hostname|
+            drone = {
+              hostname => Vagrant::Hivemind::Host.new(
+                hostname,
+                Network.next_ip_address(hosts),
+                {
+                  is_control: options[:control],
+                  box_size:   options[:size],
+                  box_type:   options[:type],
+                  is_data_detached: options[:detach]
+                })
+            }
+            hosts = hosts.merge(drone)
+            @env.ui.info "Spawned the Drone with hostname '#{hostname}'"
           end
-
-          drone = {
-            options[:hostname] => Vagrant::Hivemind::Host.new(
-              options[:hostname],
-              Network.next_ip_address(hosts),
-              {
-                is_control: options[:control],
-                box_size:   options[:size],
-                box_type:   options[:type],
-                is_data_detached: options[:detach]
-              })
-          }
-          HiveFile.write_to hosts.merge(drone), root_path
-          @env.ui.info "Spawned the Drone with hostname '#{options[:hostname]}'"
+          HiveFile.write_to hosts, root_path
 
           0
         end

@@ -25,7 +25,7 @@ module Vagrant
             o.separator ""
 
             o.on("-n", "--hostname HOSTNAME", "The hostname of the Drone (REQUIRED)") do |n|
-              options[:hostname] = n
+              options[:hostname] = Args.from_csv n
             end
 
             o.on("-d", "--directory DIRECTORY", "Specify the directory where '#{HIVE_FILE}' is located (default: current directory)") do |d|
@@ -51,12 +51,18 @@ module Vagrant
 
           hosts = HiveFile.read_from root_path
 
-          unless hosts.values.map(&:hostname).include? options[:hostname]
-            @env.ui.error "The specified hostname does not exist!"
-            return 1
+          hostnames = []
+          options[:hostname].each do |hostname|
+            if hosts.values.map(&:hostname).include? hostname
+              hostnames << hostname
+            else
+              @env.ui.warn "The hostname '#{hostname}' does not exist in the Hive!"
+            end
           end
 
-          host = hosts[options[:hostname]]
+          hostnames.each do |hostname|
+
+          host = hosts[hostname]
 
           @env.ui.info "Hostname        : #{host.hostname}"
           @env.ui.info "IP Address      : #{host.ip_address}"
@@ -65,14 +71,15 @@ module Vagrant
           @env.ui.info "Box Type        : #{BOX_TYPES[host.box_type.to_sym][:name]} (#{BOX_TYPES[host.box_type.to_sym][:box_id]})"
           @env.ui.info "GUI Machine     : #{BOX_TYPES[host.box_type.to_sym][:is_gui] ? 'Yes' : 'No'}"
           @env.ui.info "Detached Data   : #{host.is_data_detached ? 'Yes' : 'No'}"
-          @env.ui.info ""
 
           if host.forwarded_ports and !host.forwarded_ports.empty?
             @env.ui.info "Forwarded Ports"
             host.forwarded_ports.each do |forwarded_port|
               @env.ui.info "#{'%15.15s' % forwarded_port["guest_port"]} : #{forwarded_port["host_port"]}"
             end
-            @env.ui.info ""
+          end
+          @env.ui.info ""
+
           end
 
           0

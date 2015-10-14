@@ -25,7 +25,7 @@ module Vagrant
             o.separator ""
 
             o.on("-n", "--hostname HOSTNAME", "The hostname of the Drone (REQUIRED)") do |n|
-              options[:hostname] = n
+              options[:hostname] = Args.from_csv n
             end
 
             o.on("-f", "--force", "Force shut down (equivalent of pulling power)") do |f|
@@ -55,14 +55,18 @@ module Vagrant
 
           hosts = HiveFile.read_from root_path
 
-          unless hosts.values.map(&:hostname).include? options[:hostname]
-            @env.ui.error "The specified hostname does not exist!"
-            return 1
+          hostnames = []
+          options[:hostname].each do |hostname|
+            if hosts.values.map(&:hostname).include? hostname
+              hostnames << hostname
+            else
+              @env.ui.warn "The hostname '#{hostname}' does not exist in the Hive!"
+            end
           end
 
           Vagrant::Hivemind::Util::Vagrantfile.generate_hivemind_vagrantfile @env, hosts, root_path
 
-          with_target_vms(options[:hostname]) do |vm|
+          with_target_vms(hostnames) do |vm|
             vm.action(:halt, force_halt: options[:force])
           end
 
