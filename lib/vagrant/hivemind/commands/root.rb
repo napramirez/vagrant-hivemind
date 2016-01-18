@@ -55,6 +55,11 @@ module Vagrant
             Halt
           end
 
+          @subcommands.register(:generate) do
+            require_relative "generate"
+            Generate
+          end
+
         end
 
         def execute

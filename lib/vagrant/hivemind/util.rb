@@ -141,7 +141,7 @@ module Vagrant
       end
 
       class Vagrantfile
-        def self.generate_hivemind_vagrantfile(env, hosts, path = Pathname.new(Dir.pwd))
+        def self.generate_hivemind_vagrantfile(env, hosts, path = Pathname.new(Dir.pwd), generate = false)
           box_types = Vagrant::Hivemind::Constants::BOX_TYPES
           box_sizes = Vagrant::Hivemind::Constants::BOX_SIZES
           cache_path = Path.cache_path
@@ -157,19 +157,36 @@ module Vagrant
           template = ERB.new template_string
           template_result = template.result(b)
 
-          tf = Tempfile.new("Hivemind_Vagrantfile", path)
-          tf.write template_result
-          tf.close
+          if generate
+            vagrant_file = File.new(Vagrant::Hivemind::Constants::VAGRANT_FILE, "w+")
+          else
+            vagrant_file = Tempfile.new("Hivemind_Vagrantfile", path)
+          end
+          vagrant_file.write template_result
+          vagrant_file.close
 
           env.define_singleton_method :vagrantfile_name= do |vfn| @vagrantfile_name = vfn end
           env.define_singleton_method :root_path= do |root_path| @root_path = root_path end
           env.define_singleton_method :local_data_path= do |local_data_path| @local_data_path = local_data_path end
-          env.vagrantfile_name = [File.basename(tf)]
+          env.vagrantfile_name = [File.basename(vagrant_file)]
           env.root_path = path
           env.local_data_path = local_data_path
 
           nil
         end
+
+        def self.exist?(path = Pathname.new(Dir.pwd))
+          File.exist? get_vagrant_file_from_path path
+        end
+
+        private
+          def self.get_vagrant_file_from_path(path)
+            if File.directory? path
+              File.join(path, Vagrant::Hivemind::Constants::VAGRANT_FILE)
+            else
+              path
+            end
+          end
       end
 
       class Ansible
