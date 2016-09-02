@@ -1,9 +1,4 @@
-sudo: required
-
 language: ruby
 
-services:
-  - docker
-
 script:
-  - docker run -ti --rm -v $(pwd):/app ruby:2.2 /bin/bash -c "cd /app && bundle install && rspec spec"
+  - bundle exec rspec spec
